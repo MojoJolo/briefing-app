@@ -54,9 +54,13 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   padding: 24px 0 20px;
   gap: 20px;
+}
+
+.app-content::before {
+  content: '';
+  flex: 1;
 }
 
 /* Task sections */
@@ -83,20 +87,11 @@ body {
   color: #1c2128;
   line-height: 1.5;
   border-radius: 6px;
-  border-left: 2px solid transparent;
   transition: background 0.15s ease;
 }
 
 .task-item:hover {
   background: rgba(28, 33, 40, 0.03);
-}
-
-.task-item.priority-high {
-  border-left-color: #d1453b;
-}
-
-.task-item.priority-medium {
-  border-left-color: #e09b3d;
 }
 
 .task-text {
@@ -162,6 +157,14 @@ body {
 }
 
 .submit-button:disabled {
-  opacity: 0.15;
+  opacity: 0.5;
   cursor: default;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
 }

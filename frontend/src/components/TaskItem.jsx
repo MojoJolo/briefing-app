@@ -1,9 +1,6 @@
-export default function TaskItem({ text, priority }) {
-  const cls = ['task-item']
-  if (priority) cls.push(`priority-${priority}`)
-
+export default function TaskItem({ text }) {
   return (
-    <div className={cls.join(' ')}>
+    <div className="task-item">
       <span className="task-text">{text}</span>
     </div>
   )
