@@ -83,7 +83,7 @@ body {
 
 .input-bar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   padding: 10px 16px;
 }
@@ -103,6 +103,8 @@ body {
   font-size: 13px;
   color: #e8e8e8;
   caret-color: #888;
+  resize: none;
+  line-height: 1.5;
 }
 
 .input-field::placeholder {

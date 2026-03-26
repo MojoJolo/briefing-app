@@ -1,6 +1,7 @@
 export default function InputBar({ value, onChange, onSubmit }) {
   function handleKeyDown(e) {
-    if (e.key === 'Enter' && value.trim()) {
+    if (e.key === 'Enter' && !e.shiftKey && value.trim()) {
+      e.preventDefault()
       onSubmit(value.trim())
     }
   }
@@ -8,9 +9,9 @@ export default function InputBar({ value, onChange, onSubmit }) {
   return (
     <div className="input-bar">
       <span className="input-prompt">&gt;</span>
-      <input
+      <textarea
         className="input-field"
-        type="text"
+        rows={5}
         placeholder="Type anything..."
         value={value}
         onChange={e => onChange(e.target.value)}
