@@ -4,9 +4,9 @@
 
 body {
   margin: 0;
-  background: #0f0f0f;
-  color: #e8e8e8;
-  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  background: #ede9e0;
+  color: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   display: flex;
   justify-content: center;
@@ -24,9 +24,9 @@ body {
 
 .panel {
   width: 360px;
-  border: 1px solid #333;
+  border: 1px solid #d0c8bc;
   border-radius: 4px;
-  background: #141414;
+  background: #f0ece4;
 }
 
 .panel-header {
@@ -34,11 +34,11 @@ body {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: #f0f0f0;
+  color: #1a1a1a;
 }
 
 .panel-divider {
-  border-top: 1px solid #333;
+  border-top: 1px solid #d0c8bc;
 }
 
 .panel-body {
@@ -53,7 +53,7 @@ body {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #666;
+  color: #4a6fa0;
   margin-bottom: 4px;
   margin-top: 4px;
 }
@@ -64,11 +64,11 @@ body {
   gap: 8px;
   padding: 3px 0;
   font-size: 13px;
-  color: #ccc;
+  color: #333;
 }
 
 .task-bullet {
-  color: #555;
+  color: #a09888;
   flex-shrink: 0;
 }
 
@@ -89,9 +89,10 @@ body {
 }
 
 .input-prompt {
-  color: #555;
+  color: #a09888;
   font-size: 13px;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .input-field {
@@ -101,12 +102,12 @@ body {
   outline: none;
   font-family: inherit;
   font-size: 13px;
-  color: #e8e8e8;
-  caret-color: #888;
+  color: #1a1a1a;
+  caret-color: #4a6fa0;
   resize: none;
   line-height: 1.5;
 }
 
 .input-field::placeholder {
-  color: #444;
+  color: #b0a898;
 }
