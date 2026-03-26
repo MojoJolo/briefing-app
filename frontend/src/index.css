@@ -55,68 +55,58 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 24px 0 32px;
-  gap: 24px;
+  padding: 24px 0 20px;
+  gap: 20px;
 }
 
 /* Task sections */
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .task-category {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #8b93a1;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .task-item {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 3px 0;
+  align-items: center;
+  padding: 7px 10px;
   font-size: 14px;
   color: #1c2128;
   line-height: 1.5;
+  border-radius: 6px;
+  border-left: 2px solid transparent;
+  transition: background 0.15s ease;
 }
 
-.task-bullet {
-  color: #c2c8d4;
-  flex-shrink: 0;
-  font-size: 8px;
-  line-height: 2;
+.task-item:hover {
+  background: rgba(28, 33, 40, 0.03);
+}
+
+.task-item.priority-high {
+  border-left-color: #d1453b;
+}
+
+.task-item.priority-medium {
+  border-left-color: #e09b3d;
 }
 
 .task-text {
   flex: 1;
 }
 
-.task-dot {
-  flex-shrink: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  position: relative;
-  top: -1px;
-}
-
-.task-dot.high {
-  background: #c0392b;
-}
-
-.task-dot.medium {
-  background: #c87a2a;
-}
-
 /* Input */
 .app-input {
   flex-shrink: 0;
-  padding-bottom: 32px;
+  padding-bottom: 28px;
 }
 
 .input-bar {
@@ -124,10 +114,10 @@ body {
   border: 1px solid #dde0e8;
   border-radius: 14px;
   box-shadow: 0 1px 8px rgba(28, 33, 40, 0.06);
-  padding: 14px 16px 12px;
+  padding: 14px 14px 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .input-field {
@@ -137,8 +127,8 @@ body {
   outline: none;
   font-family: inherit;
   font-size: 14px;
-  color: #1a1a1a;
-  caret-color: #888;
+  color: #1c2128;
+  caret-color: #8b93a1;
   resize: none;
   line-height: 1.6;
 }
@@ -154,16 +144,17 @@ body {
 }
 
 .submit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
   background: #1c2128;
   color: #f4f5f7;
   border: none;
   border-radius: 8px;
-  padding: 5px 14px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -171,6 +162,6 @@ body {
 }
 
 .submit-button:disabled {
-  opacity: 0.2;
+  opacity: 0.15;
   cursor: default;
 }
