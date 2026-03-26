@@ -4,58 +4,71 @@ import InputBar from './components/InputBar'
 
 const INITIAL_SECTIONS = [
   {
-    category: 'URGENT',
-    tasks: [
-      { text: 'Follow up Bernard', priority: 'high' },
-      { text: 'Review PR', priority: 'medium' },
-    ],
-  },
-  {
     category: 'BLOCKER',
     tasks: [
-      { text: 'Waiting on specs', priority: null },
+      { text: 'Waiting on specs' },
     ],
   },
   {
     category: 'ISSUE',
     tasks: [
-      { text: 'Latency spike', priority: null },
+      { text: 'Latency spike' },
     ],
   },
   {
     category: 'PENDING',
     tasks: [
-      { text: 'Sync with Paulyn', priority: null },
-      { text: 'Decide infra vendor', priority: null },
+      { text: 'Sync with Paulyn' },
+      { text: 'Decide infra vendor' },
     ],
   },
 ]
 
 function App() {
   const [input, setInput] = useState('')
+  const [sections, setSections] = useState(INITIAL_SECTIONS)
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(value: string) {
+  async function handleSubmit(value: string) {
     setInput('')
-    // TODO: handle input
-    console.log('submitted:', value)
+    setLoading(true)
+    try {
+      const res = await fetch('/api/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: value }),
+      })
+      const data = await res.json()
+      setSections(prev =>
+        prev.map(section => ({
+          ...section,
+          tasks: [
+            ...section.tasks,
+            ...data.tasks.filter((t: { category: string }) => t.category === section.category),
+          ],
+        }))
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="app">
-      <div className="panel">
-        <div className="panel-header">Briefing</div>
-        <div className="panel-divider" />
-        <div className="panel-body">
-          {INITIAL_SECTIONS.map((section) => (
-            <TaskList
-              key={section.category}
-              category={section.category}
-              tasks={section.tasks}
-            />
-          ))}
-        </div>
-        <div className="panel-divider" />
-        <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} />
+      <header className="app-header">
+        <span className="app-title">Briefing</span>
+      </header>
+      <main className="app-content">
+        {sections.map((section) => (
+          <TaskList
+            key={section.category}
+            category={section.category}
+            tasks={section.tasks}
+          />
+        ))}
+      </main>
+      <div className="app-input">
+        <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} disabled={loading} />
       </div>
     </div>
   )

@@ -5,7 +5,7 @@ export default function TaskList({ category, tasks }) {
     <div className="task-list">
       <div className="task-category">{category}</div>
       {tasks.map((task, i) => (
-        <TaskItem key={i} text={task.text} priority={task.priority} />
+        <TaskItem key={i} text={task.text} />
       ))}
     </div>
   )
