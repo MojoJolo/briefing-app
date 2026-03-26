@@ -42,19 +42,19 @@ function App() {
 
   return (
     <div className="app">
-      <div className="panel">
-        <div className="panel-header">Briefing</div>
-        <div className="panel-divider" />
-        <div className="panel-body">
-          {INITIAL_SECTIONS.map((section) => (
-            <TaskList
-              key={section.category}
-              category={section.category}
-              tasks={section.tasks}
-            />
-          ))}
-        </div>
-        <div className="panel-divider" />
+      <header className="app-header">
+        <span className="app-title">Briefing</span>
+      </header>
+      <main className="app-content">
+        {INITIAL_SECTIONS.map((section) => (
+          <TaskList
+            key={section.category}
+            category={section.category}
+            tasks={section.tasks}
+          />
+        ))}
+      </main>
+      <div className="app-input">
         <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} />
       </div>
     </div>
