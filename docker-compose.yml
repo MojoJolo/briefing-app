@@ -1,4 +1,15 @@
 services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: briefing
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   backend:
     build:
       context: ./backend
@@ -10,6 +21,8 @@ services:
     volumes:
       - ./backend:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - db
 
   frontend:
     build:
@@ -21,3 +34,6 @@ services:
       - ./frontend:/app
       - /app/node_modules
     command: npm run dev -- --host
+
+volumes:
+  postgres_data:
