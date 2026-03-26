@@ -35,8 +35,9 @@ body {
 
 /* Header */
 .app-header {
-  padding: 32px 0 0;
+  padding: 32px 0 16px;
   flex-shrink: 0;
+  border-bottom: 1px solid rgba(28, 33, 40, 0.08);
 }
 
 .app-title {
