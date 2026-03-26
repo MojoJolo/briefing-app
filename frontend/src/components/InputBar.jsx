@@ -9,19 +9,21 @@ export default function InputBar({ value, onChange, onSubmit }) {
     <div className="input-bar">
       <textarea
         className="input-field"
-        rows={5}
-        placeholder="Type anything..."
+        rows={4}
+        placeholder="What's on your mind..."
         value={value}
         onChange={e => onChange(e.target.value)}
         autoFocus
       />
-      <button
-        className="submit-button"
-        onClick={handleSubmit}
-        disabled={!value.trim()}
-      >
-        Submit
-      </button>
+      <div className="input-footer">
+        <button
+          className="submit-button"
+          onClick={handleSubmit}
+          disabled={!value.trim()}
+        >
+          Send
+        </button>
+      </div>
     </div>
   )
 }
