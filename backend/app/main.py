@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.models import ProcessRequest, ProcessResponse
-from app.llm.factory import get_provider
+from app.llm.factory import provider
 
 app = FastAPI(title="Briefing App API", version="0.1.0")
 
@@ -27,6 +27,5 @@ def health_check():
 
 @app.post("/process", response_model=ProcessResponse)
 async def process_input(body: ProcessRequest):
-    provider = get_provider()
     tasks = await provider.process(body.input)
     return ProcessResponse(tasks=tasks)
