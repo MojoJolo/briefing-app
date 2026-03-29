@@ -3,8 +3,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import connect, disconnect
-from app.models import ProcessRequest, ProcessResponse
+import asyncpg
+from fastapi import Depends
+
+from app.database import connect, disconnect, get_db
+from app.models import ProcessRequest, ProcessResponse, TaskResponse
 from app.llm.factory import provider
 
 
@@ -37,6 +40,18 @@ def health_check():
 
 
 @app.post("/process", response_model=ProcessResponse)
-async def process_input(body: ProcessRequest):
+async def process_input(body: ProcessRequest, db: asyncpg.Connection = Depends(get_db)):
     tasks = await provider.process(body.input)
-    return ProcessResponse(tasks=tasks)
+
+    rows = await db.fetch(
+        """
+        INSERT INTO tasks (task, category)
+        SELECT t.task, t.category
+        FROM unnest($1::text[], $2::text[]) AS t(task, category)
+        RETURNING id, task, category, status
+        """,
+        [t.text for t in tasks],
+        [t.category.lower() for t in tasks],
+    )
+
+    return ProcessResponse(tasks=[TaskResponse(**row) for row in rows])
