@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
@@ -18,6 +19,12 @@ class TaskResponse(BaseModel):
     task: str
     category: str
     status: int
+    updated_at: datetime
+
+
+class TaskUpdate(BaseModel):
+    status: int | None = None
+    task: str | None = None
 
 
 class ProcessResponse(BaseModel):

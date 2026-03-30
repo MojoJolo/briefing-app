@@ -94,6 +94,55 @@ body {
   background: rgba(28, 33, 40, 0.03);
 }
 
+.task-checkbox {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  accent-color: #1c2128;
+  cursor: pointer;
+}
+
+.task-edit-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #dde0e8;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1c2128;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.task-item--done .task-text {
+  text-decoration: line-through;
+  color: #adb4bf;
+}
+
+.task-delete {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: transparent;
+  font-size: 11px;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 3px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.task-item:hover .task-delete {
+  color: #999;
+}
+
+.task-delete:hover {
+  color: #e55 !important;
+  background: rgba(220, 50, 50, 0.08);
+}
+
 .task-text {
   flex: 1;
 }
