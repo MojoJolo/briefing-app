@@ -25,6 +25,7 @@ export default function InputBar({ value, onChange, onSubmit, disabled }) {
         autoFocus
       />
       <div className="input-footer">
+        <span className="input-hint">Shift + Enter to send</span>
         <button
           className="submit-button"
           onClick={handleSubmit}
@@ -37,7 +38,7 @@ export default function InputBar({ value, onChange, onSubmit, disabled }) {
             </svg>
           ) : (
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8 13V3M4 7l4-4 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           )}
         </button>

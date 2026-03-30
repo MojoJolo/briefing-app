@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import TaskList from './components/TaskList'
+import DoneList from './components/DoneList'
 import InputBar from './components/InputBar'
 
 const INITIAL_SECTIONS = [
@@ -8,7 +9,7 @@ const INITIAL_SECTIONS = [
   { category: 'PENDING', tasks: [] },
 ]
 
-type Task = { id: string; text: string; status: number; updatedAt: string }
+type Task = { id: string; text: string; status: number; updatedAt: string; category: string }
 
 function sortTasks(tasks: Task[]): Task[] {
   const undone = tasks.filter(t => t.status !== 1)
@@ -18,27 +19,31 @@ function sortTasks(tasks: Task[]): Task[] {
   return [...undone, ...done]
 }
 
-function toTask(t: { id: string; task: string; status: number; updated_at: string }): Task {
-  return { id: t.id, text: t.task, status: t.status, updatedAt: t.updated_at }
+function toTask(t: { id: string; task: string; category: string; status: number; updated_at: string }): Task {
+  return { id: t.id, text: t.task, status: t.status, updatedAt: t.updated_at, category: t.category.toUpperCase() }
 }
 
 function App() {
   const [input, setInput] = useState('')
   const [sections, setSections] = useState(INITIAL_SECTIONS)
+  const [doneTasks, setDoneTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetch('/api/tasks')
       .then(res => res.json())
       .then((tasks: { id: string; task: string; category: string; status: number; updated_at: string }[]) => {
+        const all = tasks.map(toTask)
+        const done = all
+          .filter(t => t.status === 1)
+          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+        const undone = all.filter(t => t.status !== 1)
+
+        setDoneTasks(done)
         setSections(prev =>
           prev.map(section => ({
             ...section,
-            tasks: sortTasks(
-              tasks
-                .filter(t => t.category.toUpperCase() === section.category)
-                .map(toTask)
-            ),
+            tasks: undone.filter(t => t.category === section.category),
           }))
         )
       })
@@ -54,13 +59,12 @@ function App() {
         body: JSON.stringify({ input: value }),
       })
       const data = await res.json()
+      const newTasks = data.tasks.map(toTask)
       setSections(prev =>
         prev.map(section => ({
           ...section,
           tasks: sortTasks([
-            ...data.tasks
-              .filter((t: { id: string; task: string; category: string; status: number; updated_at: string }) => t.category.toUpperCase() === section.category)
-              .map(toTask),
+            ...newTasks.filter((t: Task) => t.category === section.category),
             ...section.tasks,
           ]),
         }))
@@ -78,11 +82,34 @@ function App() {
       body: JSON.stringify({ status: newStatus }),
     })
     const updated = await res.json()
+    const task = toTask(updated)
+
+    // Task is in a category section — just update in place (stays with strikethrough)
     setSections(prev =>
       prev.map(section => ({
         ...section,
-        tasks: section.tasks.map(t => t.id === id ? toTask(updated) : t),
+        tasks: section.tasks.map(t => t.id === id ? task : t),
       }))
+    )
+  }
+
+  async function handleDoneToggle(id: string) {
+    // Unchecking a task from the Done section — move it back to its category
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 0 }),
+    })
+    const updated = await res.json()
+    const task = toTask(updated)
+
+    setDoneTasks(prev => prev.filter(t => t.id !== id))
+    setSections(prev =>
+      prev.map(section =>
+        section.category === task.category
+          ? { ...section, tasks: [task, ...section.tasks] }
+          : section
+      )
     )
   }
 
@@ -93,10 +120,11 @@ function App() {
       body: JSON.stringify({ task: text }),
     })
     const updated = await res.json()
+    const task = toTask(updated)
     setSections(prev =>
       prev.map(section => ({
         ...section,
-        tasks: section.tasks.map(t => t.id === id ? toTask(updated) : t),
+        tasks: section.tasks.map(t => t.id === id ? task : t),
       }))
     )
   }
@@ -106,15 +134,24 @@ function App() {
     setSections(prev =>
       prev.map(section => ({
         ...section,
-        tasks: section.tasks.filter((t: { id?: string }) => t.id !== id),
+        tasks: section.tasks.filter(t => t.id !== id),
       }))
     )
+  }
+
+  async function handleDoneDelete(id: string) {
+    await fetch(`/api/tasks/${id}`, { method: 'DELETE' })
+    setDoneTasks(prev => prev.filter(t => t.id !== id))
   }
 
   return (
     <div className="app">
       <header className="app-header">
-        <span className="app-title">Briefing</span>
+        <div className="app-brand">
+          <span className="app-brand-mark" />
+          <span className="app-title">Briefing</span>
+        </div>
+        <div className="app-header-line" />
       </header>
       <main className="app-content">
         {sections.map((section) => (
@@ -127,6 +164,13 @@ function App() {
             onDelete={handleDelete}
           />
         ))}
+        {doneTasks.length > 0 && (
+          <DoneList
+            tasks={doneTasks}
+            onToggle={handleDoneToggle}
+            onDelete={handleDoneDelete}
+          />
+        )}
       </main>
       <div className="app-input">
         <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} disabled={loading} />
