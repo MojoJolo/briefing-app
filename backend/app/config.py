@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "claude"
     ANTHROPIC_API_KEY: str = ""
 
+    # Supabase / PostgreSQL
+    DATABASE_URL: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @model_validator(mode="after")
