@@ -3,11 +3,14 @@ import TaskItem from './TaskItem'
 export default function TaskList({ category, tasks, onToggle, onEdit, onDelete }) {
   const remaining = tasks.filter(t => t.status !== 1).length
   return (
-    <div className="task-list">
+    <div className="task-list" data-category={category}>
       <div className="task-category">
         <span>{category}</span>
         {tasks.length > 0 && <span className="task-count">{remaining}/{tasks.length}</span>}
       </div>
+      {tasks.length === 0 && (
+        <div className="task-list-empty">No items</div>
+      )}
       {tasks.map((task, i) => (
         <TaskItem
           key={task.id ?? i}

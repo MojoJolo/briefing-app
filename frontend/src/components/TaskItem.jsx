@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { renderTextWithLinks } from '../utils/renderLinks'
 
 export default function TaskItem({ text, done, onToggle, onEdit, onDelete }) {
   const [editing, setEditing] = useState(false)
@@ -53,7 +54,7 @@ export default function TaskItem({ text, done, onToggle, onEdit, onDelete }) {
           onBlur={handleBlur}
         />
       ) : (
-        <span className="task-text" onDoubleClick={handleDoubleClick}>{text}</span>
+        <span className="task-text" onDoubleClick={handleDoubleClick}>{renderTextWithLinks(text)}</span>
       )}
       <button className="task-delete" onClick={onDelete} aria-label="Delete task">✕</button>
     </div>

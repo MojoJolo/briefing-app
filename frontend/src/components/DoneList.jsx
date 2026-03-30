@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { renderTextWithLinks } from '../utils/renderLinks'
 
 export default function DoneList({ tasks, onToggle, onDelete }) {
   const [collapsed, setCollapsed] = useState(true)
@@ -23,7 +24,7 @@ export default function DoneList({ tasks, onToggle, onDelete }) {
               checked
               onChange={() => onToggle(task.id)}
             />
-            <span className="done-text">{task.text}</span>
+            <span className="done-text">{renderTextWithLinks(task.text)}</span>
             <button className="task-delete" onClick={() => onDelete(task.id)} aria-label="Delete task">✕</button>
           </div>
         ))}
