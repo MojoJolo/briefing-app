@@ -6,7 +6,9 @@ import InputBar from './components/InputBar'
 const INITIAL_SECTIONS = [
   { category: 'BLOCKER', tasks: [] },
   { category: 'ISSUE', tasks: [] },
+  { category: '', tasks: [] },
   { category: 'PENDING', tasks: [] },
+  { category: 'DELEGATED', tasks: [] },
 ]
 
 type Task = { id: string; text: string; status: number; updatedAt: string; category: string; commentCount: number }
@@ -111,6 +113,32 @@ function App() {
           : section
       )
     )
+  }
+
+  async function handleCategoryChange(id: string, newCategory: string) {
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: newCategory }),
+    })
+    const updated = await res.json()
+    const task = toTask(updated)
+
+    // Remove from old section and add to new section
+    setSections(prev => {
+      let movedTask: Task | null = null
+      const withoutTask = prev.map(section => {
+        const found = section.tasks.find(t => t.id === id)
+        if (found) movedTask = { ...found, ...task }
+        return { ...section, tasks: section.tasks.filter(t => t.id !== id) }
+      })
+      if (!movedTask) return prev
+      return withoutTask.map(section =>
+        section.category === task.category
+          ? { ...section, tasks: [movedTask!, ...section.tasks] }
+          : section
+      )
+    })
   }
 
   async function handleEdit(id: string, text: string) {
@@ -219,12 +247,13 @@ function App() {
       <main className="app-content">
         {sections.map((section) => (
           <TaskList
-            key={section.category}
+            key={section.category || '_TASKS'}
             category={section.category}
             tasks={section.tasks}
             onToggle={handleToggle}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onCategoryChange={handleCategoryChange}
             commentsMap={commentsMap}
             onFetchComments={handleFetchComments}
             onAddComment={handleAddComment}

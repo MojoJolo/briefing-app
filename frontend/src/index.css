@@ -239,6 +239,82 @@ body {
   color: #bbb;
 }
 
+/* Task label selector */
+.task-label-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.task-label-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 6px;
+  line-height: 1;
+  border-radius: 6px;
+  color: transparent;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.task-label-btn--active {
+  color: inherit;
+}
+
+.task-item:hover .task-label-btn {
+  color: #ccc;
+}
+
+.task-label-btn--active,
+.task-item:hover .task-label-btn--active {
+  color: inherit;
+}
+
+.task-label-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.task-label-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 100;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.task-label-option {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: #1a1a1a;
+  padding: 6px 10px;
+  border-radius: 7px;
+  text-align: left;
+  transition: background 0.12s ease;
+  white-space: nowrap;
+}
+
+.task-label-option:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.task-label-option--selected {
+  background: rgba(99, 102, 241, 0.08);
+  font-weight: 500;
+}
+
 /* Clickable task rows */
 .task-item--clickable,
 .done-item--clickable {
