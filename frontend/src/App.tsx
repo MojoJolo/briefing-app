@@ -9,7 +9,8 @@ const INITIAL_SECTIONS = [
   { category: 'PENDING', tasks: [] },
 ]
 
-type Task = { id: string; text: string; status: number; updatedAt: string; category: string }
+type Task = { id: string; text: string; status: number; updatedAt: string; category: string; commentCount: number }
+type Comment = { id: string; task_id: string; comment: string; created_at: string; updated_at: string }
 
 function sortTasks(tasks: Task[]): Task[] {
   const undone = tasks.filter(t => t.status !== 1)
@@ -19,8 +20,8 @@ function sortTasks(tasks: Task[]): Task[] {
   return [...undone, ...done]
 }
 
-function toTask(t: { id: string; task: string; category: string; status: number; updated_at: string }): Task {
-  return { id: t.id, text: t.task, status: t.status, updatedAt: t.updated_at, category: t.category.toUpperCase() }
+function toTask(t: { id: string; task: string; category: string; status: number; updated_at: string; comment_count?: number }): Task {
+  return { id: t.id, text: t.task, status: t.status, updatedAt: t.updated_at, category: t.category.toUpperCase(), commentCount: t.comment_count ?? 0 }
 }
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
   const [sections, setSections] = useState(INITIAL_SECTIONS)
   const [doneTasks, setDoneTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(false)
+  const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
 
   useEffect(() => {
     fetch('/api/tasks')
@@ -84,7 +86,6 @@ function App() {
     const updated = await res.json()
     const task = toTask(updated)
 
-    // Task is in a category section — just update in place (stays with strikethrough)
     setSections(prev =>
       prev.map(section => ({
         ...section,
@@ -94,7 +95,6 @@ function App() {
   }
 
   async function handleDoneToggle(id: string) {
-    // Unchecking a task from the Done section — move it back to its category
     const res = await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -144,6 +144,69 @@ function App() {
     setDoneTasks(prev => prev.filter(t => t.id !== id))
   }
 
+  // Comment handlers
+  async function handleFetchComments(taskId: string) {
+    const res = await fetch(`/api/tasks/${taskId}/comments`)
+    const data = await res.json()
+    setCommentsMap(prev => ({ ...prev, [taskId]: data }))
+  }
+
+  function updateCommentCount(taskId: string, delta: number) {
+    const updateTasks = (tasks: Task[]) =>
+      tasks.map(t => t.id === taskId ? { ...t, commentCount: t.commentCount + delta } : t)
+    setSections(prev => prev.map(s => ({ ...s, tasks: updateTasks(s.tasks) })))
+    setDoneTasks(prev => updateTasks(prev))
+  }
+
+  async function handleAddComment(taskId: string, comment: string) {
+    const res = await fetch(`/api/tasks/${taskId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comment }),
+    })
+    const newComment = await res.json()
+    setCommentsMap(prev => ({
+      ...prev,
+      [taskId]: [...(prev[taskId] || []), newComment],
+    }))
+    updateCommentCount(taskId, 1)
+  }
+
+  async function handleEditComment(commentId: string, comment: string) {
+    const res = await fetch(`/api/comments/${commentId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comment }),
+    })
+    const updated = await res.json()
+    setCommentsMap(prev => {
+      const taskComments = prev[updated.task_id] || []
+      return {
+        ...prev,
+        [updated.task_id]: taskComments.map(c => c.id === commentId ? updated : c),
+      }
+    })
+  }
+
+  async function handleDeleteComment(commentId: string) {
+    // Find which task owns this comment
+    let taskId: string | null = null
+    for (const [tid, comments] of Object.entries(commentsMap)) {
+      if (comments.some(c => c.id === commentId)) {
+        taskId = tid
+        break
+      }
+    }
+    await fetch(`/api/comments/${commentId}`, { method: 'DELETE' })
+    if (taskId) {
+      setCommentsMap(prev => ({
+        ...prev,
+        [taskId!]: (prev[taskId!] || []).filter(c => c.id !== commentId),
+      }))
+      updateCommentCount(taskId, -1)
+    }
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -162,6 +225,11 @@ function App() {
             onToggle={handleToggle}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            commentsMap={commentsMap}
+            onFetchComments={handleFetchComments}
+            onAddComment={handleAddComment}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
           />
         ))}
         {doneTasks.length > 0 && (
@@ -169,6 +237,11 @@ function App() {
             tasks={doneTasks}
             onToggle={handleDoneToggle}
             onDelete={handleDoneDelete}
+            commentsMap={commentsMap}
+            onFetchComments={handleFetchComments}
+            onAddComment={handleAddComment}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
           />
         )}
       </main>

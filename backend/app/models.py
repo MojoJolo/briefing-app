@@ -20,6 +20,7 @@ class TaskResponse(BaseModel):
     category: str
     status: int
     updated_at: datetime
+    comment_count: int = 0
 
 
 class TaskUpdate(BaseModel):
@@ -29,4 +30,20 @@ class TaskUpdate(BaseModel):
 
 class ProcessResponse(BaseModel):
     tasks: list[TaskResponse]
+
+
+class CommentResponse(BaseModel):
+    id: UUID
+    task_id: UUID
+    comment: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class CommentCreate(BaseModel):
+    comment: str
+
+
+class CommentUpdate(BaseModel):
+    comment: str | None = None
 
