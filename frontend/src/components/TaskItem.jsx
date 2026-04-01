@@ -2,7 +2,15 @@ import { useState, useRef, useEffect } from 'react'
 import { renderTextWithLinks } from '../utils/renderLinks'
 import CommentSection from './CommentSection'
 
-export default function TaskItem({ id, text, done, commentCount, onToggle, onEdit, onDelete, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+const LABEL_OPTIONS = [
+  { value: '', label: '—' },
+  { value: 'BLOCKER', label: '🚨 Blocker' },
+  { value: 'ISSUE', label: '🐛 Issue' },
+  { value: 'PENDING', label: '⏳ Pending' },
+  { value: 'DELEGATED', label: '👤 Delegated' },
+]
+
+export default function TaskItem({ id, text, category, done, commentCount, onToggle, onEdit, onDelete, onLabelChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(text)
   const [expanded, setExpanded] = useState(false)
@@ -41,8 +49,8 @@ export default function TaskItem({ id, text, done, commentCount, onToggle, onEdi
 
   function handleRowClick(e) {
     if (editing) return
-    // Don't expand when clicking checkbox, delete button, or links
-    if (e.target.closest('.task-checkbox, .task-delete, a')) return
+    // Don't expand when clicking checkbox, label select, delete button, or links
+    if (e.target.closest('.task-checkbox, .task-label-select, .task-delete, a')) return
     const next = !expanded
     setExpanded(next)
     if (next && !comments) {
@@ -59,6 +67,18 @@ export default function TaskItem({ id, text, done, commentCount, onToggle, onEdi
           checked={done}
           onChange={onToggle}
         />
+        {!done && (
+          <select
+            className="task-label-select"
+            value={category || ''}
+            onChange={e => { e.stopPropagation(); onLabelChange(e.target.value) }}
+            onClick={e => e.stopPropagation()}
+          >
+            {LABEL_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        )}
         {editing ? (
           <input
             ref={inputRef}

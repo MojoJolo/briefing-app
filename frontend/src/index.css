@@ -199,6 +199,31 @@ body {
   color: #bbb;
 }
 
+.task-label-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #999;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  max-width: 96px;
+}
+
+.task-label-select:hover {
+  border-color: #ddd;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.task-label-select:focus {
+  outline: none;
+  border-color: #bbb;
+}
+
 .task-delete {
   background: none;
   border: none;

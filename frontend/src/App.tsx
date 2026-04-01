@@ -6,7 +6,9 @@ import InputBar from './components/InputBar'
 const INITIAL_SECTIONS = [
   { category: 'BLOCKER', tasks: [] },
   { category: 'ISSUE', tasks: [] },
+  { category: '', tasks: [] },
   { category: 'PENDING', tasks: [] },
+  { category: 'DELEGATED', tasks: [] },
 ]
 
 type Task = { id: string; text: string; status: number; updatedAt: string; category: string; commentCount: number }
@@ -139,6 +141,26 @@ function App() {
     )
   }
 
+  async function handleLabelChange(id: string, newLabel: string) {
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: newLabel.toLowerCase() }),
+    })
+    const updated = await res.json()
+    const task = toTask(updated)
+
+    setSections(prev =>
+      prev.map(section => {
+        const withoutTask = section.tasks.filter(t => t.id !== id)
+        if (section.category === task.category) {
+          return { ...section, tasks: [task, ...withoutTask] }
+        }
+        return { ...section, tasks: withoutTask }
+      })
+    )
+  }
+
   async function handleDoneDelete(id: string) {
     await fetch(`/api/tasks/${id}`, { method: 'DELETE' })
     setDoneTasks(prev => prev.filter(t => t.id !== id))
@@ -225,6 +247,7 @@ function App() {
             onToggle={handleToggle}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onLabelChange={handleLabelChange}
             commentsMap={commentsMap}
             onFetchComments={handleFetchComments}
             onAddComment={handleAddComment}
