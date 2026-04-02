@@ -1,20 +1,10 @@
 import TaskItem from './TaskItem'
 
-const SECTION_LABELS = {
-  BLOCKER: '🚨 Blocker',
-  ISSUE: '🐛 Issue',
-  '': 'Tasks',
-  PENDING: '⏳ Pending',
-  DELEGATED: '👤 Delegated',
-}
-
-export default function TaskList({ category, tasks, onToggle, onEdit, onDelete, onCategoryChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
-  const label = SECTION_LABELS[category] ?? category
-
+export default function TaskList({ tasks, onToggle, onEdit, onDelete, onCategoryChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
   return (
-    <div className="task-list" data-category={category || 'tasks'}>
+    <div className="task-list">
       <div className="task-category">
-        <span>{label}</span>
+        <span>Tasks</span>
         {tasks.length > 0 && <span className="task-count">{tasks.length}</span>}
       </div>
       {tasks.length === 0 && (
