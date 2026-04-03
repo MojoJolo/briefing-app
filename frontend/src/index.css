@@ -130,7 +130,7 @@ body {
 /* Task items */
 .task-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 9px 8px;
   font-size: 14px;
   color: #1a1a1a;
@@ -143,6 +143,27 @@ body {
   background: rgba(0, 0, 0, 0.025);
 }
 
+.task-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-row-main {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.task-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 1px;
+}
+
 /* Custom checkbox */
 .task-checkbox {
   appearance: none;
@@ -151,6 +172,7 @@ body {
   width: 18px;
   height: 18px;
   margin-right: 12px;
+  margin-top: 2px;
   border: 1.5px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
@@ -237,6 +259,91 @@ body {
 .task-item--done .task-text a,
 .done-text a {
   color: #bbb;
+}
+
+/* Task label selector */
+.task-label-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.task-label-chip {
+  background: none;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 8px;
+  line-height: 1.4;
+  border-radius: 12px;
+  color: transparent;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.task-label-chip--active {
+  color: #5b5e68;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.task-label-chip-text {
+  font-size: 11px;
+}
+
+.task-item:hover .task-label-chip {
+  color: #b0b0b0;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.task-label-chip--active,
+.task-item:hover .task-label-chip--active {
+  color: #5b5e68;
+  border-color: rgba(99, 102, 241, 0.15);
+}
+
+.task-label-chip:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.task-label-menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 100;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.task-label-option {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: #1a1a1a;
+  padding: 6px 10px;
+  border-radius: 7px;
+  text-align: left;
+  transition: background 0.12s ease;
+  white-space: nowrap;
+}
+
+.task-label-option:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.task-label-option--selected {
+  background: rgba(99, 102, 241, 0.08);
+  font-weight: 500;
 }
 
 /* Clickable task rows */
@@ -577,6 +684,10 @@ body {
   .task-item {
     padding: 8px 6px;
     font-size: 13px;
+  }
+
+  .task-label-chip {
+    font-size: 10px;
   }
 
   .task-category {

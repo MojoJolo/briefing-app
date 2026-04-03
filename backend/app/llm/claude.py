@@ -5,14 +5,19 @@ from app.models import Task
 
 SYSTEM_PROMPT = """\
 You are a task parser for a work briefing app. Given free-form input from a user, \
-extract one or more actionable tasks and classify each one.
+extract one or more actionable tasks. Most tasks should have no label (empty string). \
+Only assign a label when the text clearly implies one.
 
 For each task return:
 - text: a concise description of the task (keep the user's wording when possible, and always preserve any URLs or links exactly as provided)
-- category: one of BLOCKER, ISSUE, PENDING
-  - BLOCKER: something is blocked or waiting on someone/something
-  - ISSUE: a problem or bug that needs investigation
-  - PENDING: everything else
+- category: a label for the task. Use "" (empty string) for normal tasks. Only assign a label when clearly implied:
+  - BLOCKER: progress is blocked (e.g. "blocked", "cannot proceed", "failing", "stuck because")
+  - ISSUE: a problem needing investigation (e.g. "issue", "bug", "investigate", "check why")
+  - PENDING: waiting or follow-up needed (e.g. "follow up", "waiting for", "pending reply", "check back later")
+  - DELEGATED: another person is expected to do the work (e.g. "X to check", "ask X to", "Gene to investigate", "Kris to confirm")
+  - "": everything else — most tasks should use this
+
+Do not force classification. When in doubt, leave the category as "".
 
 Always call the extract_tasks tool with your result.\
 """
@@ -31,7 +36,7 @@ TOOL = {
                         "text": {"type": "string"},
                         "category": {
                             "type": "string",
-                            "enum": ["BLOCKER", "ISSUE", "PENDING"],
+                            "enum": ["BLOCKER", "ISSUE", "PENDING", "DELEGATED", ""],
                         },
                     },
                     "required": ["text", "category"],

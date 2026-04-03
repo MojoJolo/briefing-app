@@ -1,10 +1,10 @@
 import TaskItem from './TaskItem'
 
-export default function TaskList({ category, tasks, onToggle, onEdit, onDelete, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function TaskList({ tasks, onToggle, onEdit, onDelete, onCategoryChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
   return (
-    <div className="task-list" data-category={category}>
+    <div className="task-list">
       <div className="task-category">
-        <span>{category}</span>
+        <span>Tasks</span>
         {tasks.length > 0 && <span className="task-count">{tasks.length}</span>}
       </div>
       {tasks.length === 0 && (
@@ -16,10 +16,12 @@ export default function TaskList({ category, tasks, onToggle, onEdit, onDelete, 
           id={task.id}
           text={task.text}
           done={task.status === 1}
+          category={task.category}
           commentCount={task.commentCount || 0}
           onToggle={() => onToggle(task.id, task.status)}
           onEdit={(text) => onEdit(task.id, text)}
           onDelete={() => onDelete(task.id)}
+          onCategoryChange={(cat) => onCategoryChange(task.id, cat)}
           comments={commentsMap[task.id]}
           onFetchComments={onFetchComments}
           onAddComment={onAddComment}

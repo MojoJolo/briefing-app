@@ -48,7 +48,7 @@ export default function DoneList({ tasks, onToggle, onDelete, commentsMap, onFet
   return (
     <div className="done-list">
       <div className="done-header">
-        <span className="done-label">Done</span>
+        <span className="done-label">✓ Done</span>
         <span className="done-count">{tasks.length}</span>
       </div>
       <div className="done-items">

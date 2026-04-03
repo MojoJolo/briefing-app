@@ -63,8 +63,9 @@ async def update_task(task_id: UUID, body: TaskUpdate, db: asyncpg.Connection = 
             UPDATE tasks SET
                 status = COALESCE($1, status),
                 task = COALESCE($2, task),
+                category = COALESCE($3, category),
                 updated_at = NOW()
-            WHERE id = $3
+            WHERE id = $4
             RETURNING id, task, category, status, updated_at
         )
         SELECT u.*, COALESCE(c.cnt, 0) AS comment_count
@@ -73,6 +74,7 @@ async def update_task(task_id: UUID, body: TaskUpdate, db: asyncpg.Connection = 
         """,
         body.status,
         body.task,
+        body.category,
         task_id,
     )
     return TaskResponse(**row)
