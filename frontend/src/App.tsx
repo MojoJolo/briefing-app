@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
-import TaskList from './components/TaskList'
-import DoneList from './components/DoneList'
+import { useState, useEffect, useRef } from 'react'
+import TimelineView from './components/TimelineView'
 import InputBar from './components/InputBar'
 
 type Task = { id: string; text: string; status: number; updatedAt: string; category: string; commentCount: number }
@@ -15,6 +14,8 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(false)
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
+  const contentRef = useRef<HTMLElement>(null)
+  const scrolledRef = useRef(false)
 
   useEffect(() => {
     fetch('/api/tasks')
@@ -24,10 +25,13 @@ function App() {
       })
   }, [])
 
-  const undone = tasks.filter(t => t.status !== 1)
-  const doneTasks = tasks
-    .filter(t => t.status === 1)
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+  useEffect(() => {
+    if (tasks.length > 0 && !scrolledRef.current && contentRef.current) {
+      scrolledRef.current = true
+      contentRef.current.scrollTop = contentRef.current.scrollHeight
+    }
+  }, [tasks])
+
 
   async function handleSubmit(value: string) {
     setInput('')
@@ -153,9 +157,9 @@ function App() {
         </div>
         <div className="app-header-line" />
       </header>
-      <main className="app-content">
-        <TaskList
-          tasks={undone}
+      <main className="app-content" ref={contentRef}>
+        <TimelineView
+          tasks={tasks}
           onToggle={handleToggle}
           onEdit={handleEdit}
           onDelete={handleDelete}
@@ -166,18 +170,6 @@ function App() {
           onEditComment={handleEditComment}
           onDeleteComment={handleDeleteComment}
         />
-        {doneTasks.length > 0 && (
-          <DoneList
-            tasks={doneTasks}
-            onToggle={(id: string) => handleToggle(id, 1)}
-            onDelete={handleDelete}
-            commentsMap={commentsMap}
-            onFetchComments={handleFetchComments}
-            onAddComment={handleAddComment}
-            onEditComment={handleEditComment}
-            onDeleteComment={handleDeleteComment}
-          />
-        )}
       </main>
       <div className="app-input">
         <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} disabled={loading} />
