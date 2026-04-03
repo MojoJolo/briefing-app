@@ -69,7 +69,7 @@ export default function TaskItem({ id, text, done, category, commentCount, onTog
 
   function handleRowClick(e) {
     if (editing) return
-    if (e.target.closest('.task-checkbox, .task-delete, .task-label-btn, .task-label-menu, a')) return
+    if (e.target.closest('.task-checkbox, .task-delete, .task-label-chip, .task-label-menu, a')) return
     const next = !expanded
     setExpanded(next)
     if (next && !comments) {
@@ -100,46 +100,52 @@ export default function TaskItem({ id, text, done, category, commentCount, onTog
           checked={done}
           onChange={onToggle}
         />
-        {editing ? (
-          <input
-            ref={inputRef}
-            className="task-edit-input"
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            onClick={e => e.stopPropagation()}
-          />
-        ) : (
-          <span className="task-text" onDoubleClick={handleDoubleClick}>{renderTextWithLinks(text)}</span>
-        )}
-        {commentCount > 0 && (
-          <span className="comment-count">{commentCount}</span>
-        )}
-        <div className="task-label-wrapper" ref={menuRef}>
-          <button
-            className={`task-label-btn${badge ? ' task-label-btn--active' : ''}`}
-            onClick={handleLabelClick}
-            aria-label="Change task label"
-            title="Change label"
-          >
-            {badge || '·'}
-          </button>
-          {showLabelMenu && (
-            <div className="task-label-menu">
-              {CATEGORY_OPTIONS.map(opt => (
-                <button
-                  key={opt.value}
-                  className={`task-label-option${opt.value === category ? ' task-label-option--selected' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); handleLabelSelect(opt.value); }}
-                >
-                  {opt.label}
-                </button>
-              ))}
+        <div className="task-body">
+          <div className="task-row-main">
+            {editing ? (
+              <input
+                ref={inputRef}
+                className="task-edit-input"
+                value={value}
+                onChange={e => setValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleBlur}
+                onClick={e => e.stopPropagation()}
+              />
+            ) : (
+              <span className="task-text" onDoubleClick={handleDoubleClick}>{renderTextWithLinks(text)}</span>
+            )}
+            {commentCount > 0 && (
+              <span className="comment-count">{commentCount}</span>
+            )}
+            <button className="task-delete" onClick={(e) => { e.stopPropagation(); onDelete(); }} aria-label="Delete task">✕</button>
+          </div>
+          <div className="task-row-meta">
+            <div className="task-label-wrapper" ref={menuRef}>
+              <button
+                className={`task-label-chip${badge ? ' task-label-chip--active' : ''}`}
+                onClick={handleLabelClick}
+                aria-label="Change task label"
+                title="Change label"
+              >
+                {badge ? <>{badge} <span className="task-label-chip-text">{CATEGORY_OPTIONS.find(o => o.value === category)?.label.split(' ').slice(1).join(' ')}</span></> : '+ label'}
+              </button>
+              {showLabelMenu && (
+                <div className="task-label-menu">
+                  {CATEGORY_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      className={`task-label-option${opt.value === category ? ' task-label-option--selected' : ''}`}
+                      onClick={(e) => { e.stopPropagation(); handleLabelSelect(opt.value); }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-        <button className="task-delete" onClick={(e) => { e.stopPropagation(); onDelete(); }} aria-label="Delete task">✕</button>
       </div>
       {expanded && (
         <CommentSection

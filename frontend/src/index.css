@@ -130,7 +130,7 @@ body {
 /* Task items */
 .task-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 9px 8px;
   font-size: 14px;
   color: #1a1a1a;
@@ -143,6 +143,27 @@ body {
   background: rgba(0, 0, 0, 0.025);
 }
 
+.task-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-row-main {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.task-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 1px;
+}
+
 /* Custom checkbox */
 .task-checkbox {
   appearance: none;
@@ -151,6 +172,7 @@ body {
   width: 18px;
   height: 18px;
   margin-right: 12px;
+  margin-top: 2px;
   border: 1.5px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
@@ -243,41 +265,50 @@ body {
 .task-label-wrapper {
   position: relative;
   flex-shrink: 0;
-  margin-left: 4px;
 }
 
-.task-label-btn {
+.task-label-chip {
   background: none;
-  border: none;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  font-size: 13px;
-  padding: 2px 6px;
-  line-height: 1;
-  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 8px;
+  line-height: 1.4;
+  border-radius: 12px;
   color: transparent;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
-.task-label-btn--active {
-  color: inherit;
+.task-label-chip--active {
+  color: #5b5e68;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.15);
 }
 
-.task-item:hover .task-label-btn {
-  color: #ccc;
+.task-label-chip-text {
+  font-size: 11px;
 }
 
-.task-label-btn--active,
-.task-item:hover .task-label-btn--active {
-  color: inherit;
+.task-item:hover .task-label-chip {
+  color: #b0b0b0;
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
-.task-label-btn:hover {
-  background: rgba(0, 0, 0, 0.04);
+.task-label-chip--active,
+.task-item:hover .task-label-chip--active {
+  color: #5b5e68;
+  border-color: rgba(99, 102, 241, 0.15);
+}
+
+.task-label-chip:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.18);
 }
 
 .task-label-menu {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 100%;
   margin-top: 4px;
   background: #fff;
@@ -653,6 +684,10 @@ body {
   .task-item {
     padding: 8px 6px;
     font-size: 13px;
+  }
+
+  .task-label-chip {
+    font-size: 10px;
   }
 
   .task-category {
