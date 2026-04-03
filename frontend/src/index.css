@@ -269,14 +269,14 @@ body {
 
 .task-label-chip {
   background: none;
-  border: 1px dashed rgba(0, 0, 0, 0.12);
+  border: 1px dashed rgba(0, 0, 0, 0.18);
   cursor: pointer;
   font-family: inherit;
   font-size: 11px;
   padding: 2px 8px;
   line-height: 1.4;
   border-radius: 12px;
-  color: transparent;
+  color: rgba(0, 0, 0, 0.22);
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
@@ -291,8 +291,8 @@ body {
 }
 
 .task-item:hover .task-label-chip {
-  color: #b0b0b0;
-  border-color: rgba(0, 0, 0, 0.12);
+  color: #999;
+  border-color: rgba(0, 0, 0, 0.22);
 }
 
 .task-label-chip--active,
