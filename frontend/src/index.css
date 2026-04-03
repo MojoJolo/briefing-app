@@ -76,10 +76,6 @@ body {
   padding: 8px 0 24px;
 }
 
-.app-content::before {
-  content: '';
-  flex: 1;
-}
 
 /* scrollbar */
 .app-content::-webkit-scrollbar {
