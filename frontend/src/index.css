@@ -73,7 +73,7 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 8px 0 24px;
+  padding: 0 0 24px;
 }
 
 
