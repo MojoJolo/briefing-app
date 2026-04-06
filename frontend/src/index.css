@@ -27,9 +27,9 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: 860px;
+  max-width: 940px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 80px;
 }
 
 /* Header */
@@ -73,7 +73,8 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 0 0 24px;
+  margin-left: -80px;
+  padding: 0 0 24px 80px;
 }
 
 
@@ -190,6 +191,7 @@ body {
 
 /* Task items */
 .task-item {
+  position: relative;
   display: flex;
   align-items: flex-start;
   padding: 9px 8px;
@@ -218,12 +220,6 @@ body {
   gap: 4px;
 }
 
-.task-row-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-left: 1px;
-}
 
 /* Custom checkbox */
 .task-checkbox {
@@ -327,56 +323,83 @@ body {
   font-weight: 500;
 }
 
-/* Task label selector */
-.task-label-wrapper {
-  position: relative;
-  flex-shrink: 0;
+/* Category strip + label — gutter, outside timeline */
+.task-cat-wrapper {
+  position: absolute;
+  left: -80px;
+  top: 0;
+  bottom: 0;
+  width: 83px; /* 80px gutter + 3px strip */
+  display: flex;
+  align-items: stretch;
 }
 
-.task-label-chip {
-  background: none;
-  border: 1px dashed rgba(0, 0, 0, 0.18);
+.task-cat-btn {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  border: none;
+  background: transparent;
   cursor: pointer;
   font-family: inherit;
+  padding: 0;
+}
+
+.task-cat-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
   font-size: 11px;
-  padding: 2px 8px;
-  line-height: 1.4;
-  border-radius: 12px;
-  color: rgba(0, 0, 0, 0.22);
-  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  font-weight: 500;
+  color: transparent;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+  text-align: right;
 }
 
-.task-label-chip--active {
-  color: #5b5e68;
-  background: rgba(99, 102, 241, 0.06);
-  border: 1px solid rgba(99, 102, 241, 0.15);
+.task-cat-strip {
+  width: 3px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.15s ease;
 }
 
-.task-label-chip-text {
-  font-size: 11px;
+/* No category: reveal faintly on row hover */
+.task-item:hover .task-cat-btn--none .task-cat-strip {
+  background: rgba(0, 0, 0, 0.1);
+}
+.task-item:hover .task-cat-btn--none .task-cat-text {
+  color: #ccc;
 }
 
-.task-item:hover .task-label-chip {
-  color: #999;
-  border-color: rgba(0, 0, 0, 0.22);
-}
+/* Blocker */
+.task-cat-btn--blocker .task-cat-strip       { background: #e53935; }
+.task-cat-btn--blocker .task-cat-text        { color: #9b9b9b; }
+.task-cat-btn--blocker:hover .task-cat-strip { background: #c62828; }
 
-.task-label-chip--active,
-.task-item:hover .task-label-chip--active {
-  color: #5b5e68;
-  border-color: rgba(99, 102, 241, 0.15);
-}
+/* Issue */
+.task-cat-btn--issue .task-cat-strip         { background: #fb8c00; }
+.task-cat-btn--issue .task-cat-text          { color: #9b9b9b; }
+.task-cat-btn--issue:hover .task-cat-strip   { background: #e65100; }
 
-.task-label-chip:hover {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.18);
-}
+/* Pending */
+.task-cat-btn--pending .task-cat-strip       { background: #1e88e5; }
+.task-cat-btn--pending .task-cat-text        { color: #9b9b9b; }
+.task-cat-btn--pending:hover .task-cat-strip { background: #1565c0; }
+
+/* Delegated */
+.task-cat-btn--delegated .task-cat-strip       { background: #43a047; }
+.task-cat-btn--delegated .task-cat-text        { color: #9b9b9b; }
+.task-cat-btn--delegated:hover .task-cat-strip { background: #2e7d32; }
 
 .task-label-menu {
   position: absolute;
-  left: 0;
-  top: 100%;
-  margin-top: 4px;
+  left: 100%;
+  top: 0;
+  margin-left: 8px;
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 10px;
@@ -440,7 +463,7 @@ body {
 
 /* Comment section */
 .comment-section {
-  padding: 4px 8px 10px 42px;
+  padding: 4px 8px 10px 38px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -735,10 +758,18 @@ body {
     padding: 18px 0 14px;
   }
 
+  .app-content {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
   .app-title {
     font-size: 15px;
   }
 
+  .task-cat-wrapper {
+    display: none;
+  }
 
   .task-list {
     padding: 0 2px;
@@ -747,10 +778,6 @@ body {
   .task-item {
     padding: 8px 6px;
     font-size: 13px;
-  }
-
-  .task-label-chip {
-    font-size: 10px;
   }
 
   .task-category {
