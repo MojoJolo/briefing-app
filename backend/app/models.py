@@ -19,6 +19,7 @@ class TaskResponse(BaseModel):
     task: str
     category: str
     status: int
+    created_at: datetime
     updated_at: datetime
     comment_count: int = 0
 

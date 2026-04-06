@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import TimelineView from './components/TimelineView'
 import InputBar from './components/InputBar'
 
-type Task = { id: string; text: string; status: number; updatedAt: string; category: string; commentCount: number }
+type Task = { id: string; text: string; status: number; createdAt: string; updatedAt: string; category: string; commentCount: number }
 type Comment = { id: string; task_id: string; comment: string; created_at: string; updated_at: string }
 
-function toTask(t: { id: string; task: string; category: string; status: number; updated_at: string; comment_count?: number }): Task {
-  return { id: t.id, text: t.task, status: t.status, updatedAt: t.updated_at, category: t.category.toUpperCase(), commentCount: t.comment_count ?? 0 }
+function toTask(t: { id: string; task: string; category: string; status: number; created_at: string; updated_at: string; comment_count?: number }): Task {
+  return { id: t.id, text: t.task, status: t.status, createdAt: t.created_at, updatedAt: t.updated_at, category: t.category.toUpperCase(), commentCount: t.comment_count ?? 0 }
 }
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     fetch('/api/tasks')
       .then(res => res.json())
-      .then((raw: { id: string; task: string; category: string; status: number; updated_at: string; comment_count?: number }[]) => {
+      .then((raw: { id: string; task: string; category: string; status: number; created_at: string; updated_at: string; comment_count?: number }[]) => {
         setTasks(raw.map(toTask))
       })
   }, [])

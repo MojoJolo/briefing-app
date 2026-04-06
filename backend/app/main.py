@@ -44,7 +44,7 @@ def health_check():
 async def get_tasks(db: asyncpg.Connection = Depends(get_db)):
     rows = await db.fetch(
         """
-        SELECT t.id, t.task, t.category, t.status, t.updated_at,
+        SELECT t.id, t.task, t.category, t.status, t.created_at, t.updated_at,
                COALESCE(c.cnt, 0) AS comment_count
         FROM tasks t
         LEFT JOIN (SELECT task_id, COUNT(*) AS cnt FROM comments GROUP BY task_id) c ON c.task_id = t.id
@@ -66,7 +66,7 @@ async def update_task(task_id: UUID, body: TaskUpdate, db: asyncpg.Connection = 
                 category = COALESCE($3, category),
                 updated_at = NOW()
             WHERE id = $4
-            RETURNING id, task, category, status, updated_at
+            RETURNING id, task, category, status, created_at, updated_at
         )
         SELECT u.*, COALESCE(c.cnt, 0) AS comment_count
         FROM updated u
@@ -97,7 +97,7 @@ async def process_input(body: ProcessRequest, db: asyncpg.Connection = Depends(g
         INSERT INTO tasks (task, category)
         SELECT t.task, t.category
         FROM unnest($1::text[], $2::text[]) AS t(task, category)
-        RETURNING id, task, category, status, updated_at
+        RETURNING id, task, category, status, created_at, updated_at
         """,
         [t.text for t in tasks],
         [t.category.lower() for t in tasks],
