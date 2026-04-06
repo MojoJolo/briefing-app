@@ -768,6 +768,48 @@ body {
   }
 
   .task-cat-wrapper {
+    position: static;
+    width: auto;
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    margin-right: 6px;
+  }
+
+  .task-cat-btn {
+    flex-direction: row-reverse;
+    align-items: center;
+    padding: 0;
+  }
+
+  .task-cat-strip {
+    width: 3px;
+    height: 18px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  .task-cat-text {
+    padding-right: 0;
+    padding-left: 5px;
+    font-size: 10px;
+    max-width: 56px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-content: flex-start;
+    white-space: nowrap;
+  }
+
+  .task-cat-btn--blocker .task-cat-text,
+  .task-cat-btn--issue .task-cat-text,
+  .task-cat-btn--pending .task-cat-text,
+  .task-cat-btn--delegated .task-cat-text {
+    color: #9b9b9b;
+  }
+
+  .task-cat-btn--none .task-cat-text,
+  .task-cat-btn--none .task-cat-strip {
     display: none;
   }
 
