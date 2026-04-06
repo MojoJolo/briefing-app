@@ -322,6 +322,11 @@ body {
   color: #bbb;
 }
 
+.mention {
+  color: #6366F1;
+  font-weight: 500;
+}
+
 /* Task label selector */
 .task-label-wrapper {
   position: relative;

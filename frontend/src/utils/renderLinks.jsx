@@ -1,4 +1,4 @@
-const URL_REGEX = /(https?:\/\/[^\s]+)/g
+const TOKEN_REGEX = /(https?:\/\/[^\s]+|@\w+)/g
 
 function truncateUrl(url, maxLen = 50) {
   if (url.length <= maxLen) return url
@@ -12,14 +12,18 @@ function truncateUrl(url, maxLen = 50) {
 }
 
 export function renderTextWithLinks(text) {
-  const parts = text.split(URL_REGEX)
-  return parts.map((part, i) =>
-    URL_REGEX.test(part) ? (
-      <a key={i} href={part} target="_blank" rel="noopener noreferrer" title={part}>
-        {truncateUrl(part)}
-      </a>
-    ) : (
-      part
-    )
-  )
+  const parts = text.split(TOKEN_REGEX)
+  return parts.map((part, i) => {
+    if (/^https?:\/\//.test(part)) {
+      return (
+        <a key={i} href={part} target="_blank" rel="noopener noreferrer" title={part}>
+          {truncateUrl(part)}
+        </a>
+      )
+    }
+    if (/^@\w+$/.test(part)) {
+      return <span key={i} className="mention">{part}</span>
+    }
+    return part
+  })
 }
