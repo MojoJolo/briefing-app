@@ -11,7 +11,8 @@ const CATEGORY_OPTIONS = [
   { value: 'IDEA', label: '💡 Idea' },
 ]
 
-export default function TaskItem({ id, text, done, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function TaskItem({ id, text, done, strikethrough, fading, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+  const showDoneStyle = strikethrough !== undefined ? strikethrough : done
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(text)
   const [expanded, setExpanded] = useState(false)
@@ -102,8 +103,8 @@ export default function TaskItem({ id, text, done, category, commentCount, onTog
     : null
 
   return (
-    <div className={`task-item-wrapper${expanded ? ' task-item-wrapper--expanded' : ''}`}>
-      <div className={`task-item task-item--clickable${done ? ' task-item--done' : ''}`} onClick={handleRowClick}>
+    <div className={`task-item-wrapper${expanded ? ' task-item-wrapper--expanded' : ''}${fading ? ' task-item-wrapper--fading' : ''}`}>
+      <div className={`task-item task-item--clickable${showDoneStyle ? ' task-item--done' : ''}`} onClick={handleRowClick}>
 
         <div className="task-cat-wrapper" ref={menuRef}>
           <button

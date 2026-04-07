@@ -1,11 +1,11 @@
-import { useRef, useEffect, useState } from 'react'
+import { useState } from 'react'
 import TaskItem from './TaskItem'
 
 const BUCKET_ORDER = ['Older', 'Last Month', 'Four Weeks Ago', 'Three Weeks Ago', 'Two Weeks Ago', 'Last Week', 'This Week', 'Yesterday', 'Today']
 
-function getBucket(updatedAt) {
+function getBucket(dateStr) {
   const now = new Date()
-  const taskDate = new Date(updatedAt)
+  const taskDate = new Date(dateStr)
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const yesterdayStart = new Date(todayStart.getTime() - 86400000)
   const dayOfWeek = now.getDay() // 0 = Sunday
@@ -28,33 +28,33 @@ function getBucket(updatedAt) {
   return 'Older'
 }
 
-export default function TimelineView({ tasks, onToggle, onEdit, onDelete, onCategoryChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
-  const [expandedDone, setExpandedDone] = useState({})
-
+function buildBuckets(tasks, dateField, sortAsc) {
   const buckets = {}
   for (const task of tasks) {
-    const bucket = getBucket(task.createdAt)
+    const bucket = getBucket(task[dateField])
     if (!buckets[bucket]) buckets[bucket] = []
     buckets[bucket].push(task)
   }
-
   for (const bucket of Object.keys(buckets)) {
-    buckets[bucket].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    buckets[bucket].sort((a, b) => {
+      const diff = new Date(a[dateField]) - new Date(b[dateField])
+      return sortAsc ? diff : -diff
+    })
   }
+  return buckets
+}
 
-  const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
+export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onEdit, onDelete, onCategoryChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
 
-  if (visibleBuckets.length === 0) {
-    return <div className="task-list-empty" style={{ padding: '12px 8px' }}>No items</div>
-  }
-
-  function renderTask(task, i) {
+  function renderTask(task, i, opts = {}) {
     return (
       <TaskItem
         key={task.id ?? i}
         id={task.id}
         text={task.text}
         done={task.status === 1}
+        strikethrough={opts.strikethrough}
+        fading={opts.fading}
         category={task.category}
         commentCount={task.commentCount || 0}
         onToggle={() => onToggle(task.id, task.status)}
@@ -70,35 +70,48 @@ export default function TimelineView({ tasks, onToggle, onEdit, onDelete, onCate
     )
   }
 
-  return (
-    <div className="timeline">
-      {visibleBuckets.map(bucket => {
-        const active = buckets[bucket].filter(t => t.status !== 1)
-        const done = buckets[bucket].filter(t => t.status === 1)
-        const showDone = expandedDone[bucket]
+  if (tab === 'done') {
+    const doneTasks = tasks.filter(t => t.status === 1 && !justMarkedDone.has(t.id))
+    const buckets = buildBuckets(doneTasks, 'updatedAt', false)
+    const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
 
-        return (
+    if (visibleBuckets.length === 0) {
+      return <div className="task-list-empty" style={{ padding: '12px 8px' }}>No done items</div>
+    }
+
+    return (
+      <div className="timeline">
+        {visibleBuckets.map(bucket => (
           <div key={bucket} className="timeline-section">
             <div className="timeline-header">{bucket}</div>
             <div className="timeline-items">
-              {active.map((task, i) => renderTask(task, i))}
-              {done.length > 0 && (
-                <>
-                  <button
-                    className="done-toggle"
-                    onClick={() => setExpandedDone(prev => ({ ...prev, [bucket]: !prev[bucket] }))}
-                  >
-                    <span className="done-toggle-label">✓ Done</span>
-                    <span className="done-toggle-count">{done.length}</span>
-                    <span className={`done-chevron${showDone ? ' done-chevron--open' : ''}`}>›</span>
-                  </button>
-                  {showDone && done.map((task, i) => renderTask(task, i))}
-                </>
-              )}
+              {buckets[bucket].map((task, i) => renderTask(task, i, { strikethrough: false }))}
             </div>
           </div>
-        )
-      })}
+        ))}
+      </div>
+    )
+  }
+
+  // Open tab: show open tasks + tasks just marked done in this session (in-place, with strikethrough)
+  const activeTasks = tasks.filter(t => t.status === 0 || justMarkedDone.has(t.id))
+  const buckets = buildBuckets(activeTasks, 'createdAt', true)
+  const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
+
+  if (visibleBuckets.length === 0) {
+    return <div className="task-list-empty" style={{ padding: '12px 8px' }}>No items</div>
+  }
+
+  return (
+    <div className="timeline">
+      {visibleBuckets.map(bucket => (
+        <div key={bucket} className="timeline-section">
+          <div className="timeline-header">{bucket}</div>
+          <div className="timeline-items">
+            {buckets[bucket].map((task, i) => renderTask(task, i, { fading: justMarkedDone.has(task.id) }))}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

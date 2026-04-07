@@ -64,10 +64,49 @@ body {
   background: rgba(0, 0, 0, 0.1);
 }
 
+.app-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .app-brand {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.app-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.app-tab {
+  all: unset;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  padding: 4px 12px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+}
+
+.app-tab:hover {
+  color: #374151;
+}
+
+.app-tab--active {
+  background: #fff;
+  color: #1a1a1a;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .app-brand-mark {
@@ -171,6 +210,15 @@ body {
   flex-direction: column;
   gap: 2px;
   padding-bottom: 20px;
+}
+
+@keyframes task-fade-out {
+  0%   { opacity: 1;   filter: blur(0px); }
+  100% { opacity: 0.2; filter: blur(3px); }
+}
+
+.task-item-wrapper--fading {
+  animation: task-fade-out 1.5s ease 1.5s forwards;
 }
 
 .done-toggle {

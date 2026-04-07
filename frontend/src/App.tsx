@@ -14,8 +14,11 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(false)
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
+  const [tab, setTab] = useState<'open' | 'done'>('open')
+  const [justMarkedDone, setJustMarkedDone] = useState<Set<string>>(new Set())
   const contentRef = useRef<HTMLElement>(null)
   const scrolledRef = useRef(false)
+  const doneTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   useEffect(() => {
     fetch('/api/tasks')
@@ -31,6 +34,12 @@ function App() {
       contentRef.current.scrollTop = contentRef.current.scrollHeight
     }
   }, [tasks])
+
+  useEffect(() => {
+    if (tab === 'open' && contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight
+    }
+  }, [tab])
 
 
   async function handleSubmit(value: string) {
@@ -60,6 +69,25 @@ function App() {
     const updated = await res.json()
     const task = toTask(updated)
     setTasks(prev => prev.map(t => t.id === id ? task : t))
+    if (newStatus === 1) {
+      setJustMarkedDone(prev => new Set([...prev, id]))
+      doneTimers.current[id] = setTimeout(() => {
+        setJustMarkedDone(prev => {
+          const next = new Set(prev)
+          next.delete(id)
+          return next
+        })
+        delete doneTimers.current[id]
+      }, 3000)
+    } else {
+      clearTimeout(doneTimers.current[id])
+      delete doneTimers.current[id]
+      setJustMarkedDone(prev => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+    }
   }
 
   async function handleCategoryChange(id: string, newCategory: string) {
@@ -151,15 +179,29 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <div className="app-brand">
-          <span className="app-brand-mark" />
-          <span className="app-title">Briefing</span>
+        <div className="app-header-row">
+          <div className="app-brand">
+            <span className="app-brand-mark" />
+            <span className="app-title">Briefing</span>
+          </div>
+          <div className="app-tabs">
+            <button
+              className={`app-tab${tab === 'open' ? ' app-tab--active' : ''}`}
+              onClick={() => setTab('open')}
+            >Open</button>
+            <button
+              className={`app-tab${tab === 'done' ? ' app-tab--active' : ''}`}
+              onClick={() => setTab('done')}
+            >Done</button>
+          </div>
         </div>
         <div className="app-header-line" />
       </header>
       <main className="app-content" ref={contentRef}>
         <TimelineView
           tasks={tasks}
+          tab={tab}
+          justMarkedDone={justMarkedDone}
           onToggle={handleToggle}
           onEdit={handleEdit}
           onDelete={handleDelete}
@@ -171,9 +213,11 @@ function App() {
           onDeleteComment={handleDeleteComment}
         />
       </main>
-      <div className="app-input">
-        <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} disabled={loading} />
-      </div>
+      {tab === 'open' && (
+        <div className="app-input">
+          <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} disabled={loading} />
+        </div>
+      )}
     </div>
   )
 }
