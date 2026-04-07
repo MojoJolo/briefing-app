@@ -8,6 +8,7 @@ const CATEGORY_OPTIONS = [
   { value: 'ISSUE', label: '🐛 Issue' },
   { value: 'PENDING', label: '⏳ Pending' },
   { value: 'DELEGATED', label: '👤 Delegated' },
+  { value: 'IDEA', label: '💡 Idea' },
 ]
 
 export default function TaskItem({ id, text, done, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {

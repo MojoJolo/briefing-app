@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class Task(BaseModel):
     text: str
-    category: Literal["BLOCKER", "ISSUE", "PENDING", "DELEGATED", ""]
+    category: Literal["BLOCKER", "ISSUE", "PENDING", "DELEGATED", "IDEA", ""]
 
 
 class ProcessRequest(BaseModel):

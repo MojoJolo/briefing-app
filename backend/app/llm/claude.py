@@ -15,6 +15,7 @@ For each task return:
   - ISSUE: a problem needing investigation (e.g. "issue", "bug", "investigate", "check why")
   - PENDING: waiting or follow-up needed (e.g. "follow up", "waiting for", "pending reply", "check back later")
   - DELEGATED: another person is expected to do the work (e.g. "X to check", "ask X to", "Gene to investigate", "Kris to confirm"). Always keep the person's name in the text.
+  - IDEA: a suggestion, proposal, or thing to consider (e.g. "idea", "what if", "we could", "might be worth")
   - "": everything else — most tasks should use this
 
 Do not force classification. When in doubt, leave the category as "".
@@ -36,7 +37,7 @@ TOOL = {
                         "text": {"type": "string"},
                         "category": {
                             "type": "string",
-                            "enum": ["BLOCKER", "ISSUE", "PENDING", "DELEGATED", ""],
+                            "enum": ["BLOCKER", "ISSUE", "PENDING", "DELEGATED", "IDEA", ""],
                         },
                     },
                     "required": ["text", "category"],
