@@ -710,7 +710,7 @@ body {
   justify-content: center;
   width: 34px;
   height: 34px;
-  background: #e85d4a;
+  background: #6366F1;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -719,7 +719,7 @@ body {
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #d94a38;
+  background: #4f46e5;
   transform: scale(1.04);
 }
 
@@ -768,26 +768,31 @@ body {
   }
 
   .task-cat-wrapper {
-    position: static;
-    width: auto;
+    position: relative;
+    left: auto;
+    width: 64px;
     display: flex;
     align-items: stretch;
     flex-shrink: 0;
+    margin-top: -8px;
+    margin-bottom: -8px;
     margin-right: 6px;
+    align-self: stretch;
   }
 
   .task-cat-btn {
     flex-direction: row-reverse;
+    justify-content: flex-end;
     align-items: center;
     padding: 0;
   }
 
   .task-cat-strip {
     width: 3px;
-    height: 18px;
+    height: auto;
     border-radius: 2px;
     flex-shrink: 0;
-    align-self: center;
+    align-self: stretch;
   }
 
   .task-cat-text {
@@ -808,9 +813,21 @@ body {
     color: #9b9b9b;
   }
 
-  .task-cat-btn--none .task-cat-text,
   .task-cat-btn--none .task-cat-strip {
-    display: none;
+    display: block;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .task-cat-btn--none .task-cat-text {
+    display: flex;
+    color: rgba(0, 0, 0, 0.2);
+  }
+
+  .task-label-menu {
+    left: 0;
+    top: 100%;
+    margin-left: 0;
+    margin-top: 2px;
   }
 
   .task-list {

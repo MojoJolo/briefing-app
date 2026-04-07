@@ -15,6 +15,7 @@ export default function TaskItem({ id, text, done, category, commentCount, onTog
   const [value, setValue] = useState(text)
   const [expanded, setExpanded] = useState(false)
   const [showLabelMenu, setShowLabelMenu] = useState(false)
+  const [menuPos, setMenuPos] = useState(null)
   const inputRef = useRef(null)
   const menuRef = useRef(null)
 
@@ -33,7 +34,11 @@ export default function TaskItem({ id, text, done, category, commentCount, onTog
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
   }, [showLabelMenu])
 
   function handleDoubleClick(e) {
@@ -72,6 +77,14 @@ export default function TaskItem({ id, text, done, category, commentCount, onTog
 
   function handleLabelClick(e) {
     e.stopPropagation()
+    if (!showLabelMenu) {
+      const rect = menuRef.current.getBoundingClientRect()
+      const isMobile = window.innerWidth <= 640
+      setMenuPos(isMobile
+        ? { top: rect.bottom + 4, left: rect.left }
+        : { top: rect.top, left: rect.right + 8 }
+      )
+    }
     setShowLabelMenu(prev => !prev)
   }
 
@@ -100,8 +113,11 @@ export default function TaskItem({ id, text, done, category, commentCount, onTog
             <span className="task-cat-text">{catName || '+ label'}</span>
             <span className="task-cat-strip" />
           </button>
-          {showLabelMenu && (
-            <div className="task-label-menu">
+          {showLabelMenu && menuPos && (
+            <div
+              className="task-label-menu"
+              style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, margin: 0 }}
+            >
               {CATEGORY_OPTIONS.map(opt => (
                 <button
                   key={opt.value}
