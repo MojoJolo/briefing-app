@@ -9,7 +9,7 @@ extract one or more actionable tasks. Most tasks should have no label (empty str
 Only assign a label when the text clearly implies one.
 
 For each task return:
-- text: a concise description of the task (keep the user's wording when possible, and always preserve any URLs or links exactly as provided). For DELEGATED tasks, always preserve the person's name exactly as written.
+- text: fix spelling errors and unclear phrasing only. Do not change the grammatical structure or voice of the input — if the user writes a noun phrase, keep it a noun phrase; do not convert to imperative form. Always preserve URLs and links exactly as provided. For DELEGATED tasks, always preserve the person's name exactly as written.
 - category: a label for the task. Use "" (empty string) for normal tasks. Only assign a label when clearly implied:
   - BLOCKER: progress is blocked (e.g. "blocked", "cannot proceed", "failing", "stuck because")
   - ISSUE: a problem needing investigation (e.g. "issue", "bug", "investigate", "check why")

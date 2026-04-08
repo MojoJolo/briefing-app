@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Briefing — For Engineering Leaders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #f0eeeb;
+      --surface:       #ffffff;
+      --border:        rgba(0,0,0,0.08);
+      --border-solid:  #e2dfd9;
+      --text:          #1a1a1a;
+      --muted:         #6b7280;
+      --accent:        #6366F1;
+      --accent-hover:  #4f46e5;
+      --bar-blocker:   #e53935;
+      --bar-issue:     #fb8c00;
+      --bar-pending:   #1e88e5;
+      --bar-delegated: #43a047;
+      --success:       #3d7a57;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .logo-bar {
+      width: 3px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .status-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      border: 1px solid var(--border-solid);
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: var(--bg);
+    }
+
+    /* ── Layout ── */
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 73px - 57px);
+    }
+
+    /* ── Left ── */
+    .left {
+      padding: 72px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.1s ease forwards;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(38px, 4.5vw, 58px);
+      line-height: 1.1;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.15s ease forwards;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .body-text {
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 400px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s ease forwards;
+    }
+
+    /* ── Form ── */
+    .form-wrapper {
+      opacity: 0;
+      animation: fadeUp 0.6s 0.28s ease forwards;
+    }
+
+    .form-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .input-row {
+      display: flex;
+      border: 1px solid var(--border-solid);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: var(--surface);
+    }
+
+    .input-row:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    }
+
+    .email-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 13px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      min-width: 0;
+    }
+
+    .email-input::placeholder { color: #b5b3ae; }
+    .email-input { caret-color: var(--accent); }
+
+    .submit-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 13px 22px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .submit-btn:hover { background: var(--accent-hover); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .success-msg {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--success);
+      padding: 13px 16px;
+      background: rgba(61, 122, 87, 0.08);
+      border: 1px solid rgba(61, 122, 87, 0.25);
+      border-radius: 6px;
+    }
+
+    .success-msg.show { display: flex; }
+
+    /* ── Right ── */
+    .right {
+      padding: 72px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--border-solid) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    /* ── Task feed card ── */
+    .task-feed {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      opacity: 0;
+      animation: fadeUp 0.6s 0.4s ease forwards;
+    }
+
+    .feed-header {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 20px 12px 28px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      opacity: 0;
+      transform: translateX(8px);
+    }
+
+    .task-item::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 12px;
+      bottom: 12px;
+      width: 3px;
+      border-radius: 2px;
+    }
+
+    .task-item.cat-blocker::before   { background: var(--bar-blocker); }
+    .task-item.cat-issue::before     { background: var(--bar-issue); }
+    .task-item.cat-pending::before   { background: var(--bar-pending); }
+    .task-item.cat-delegated::before { background: var(--bar-delegated); }
+
+    .task-item:nth-child(2) { animation: slideIn 0.4s 0.55s ease forwards; }
+    .task-item:nth-child(3) { animation: slideIn 0.4s 0.68s ease forwards; }
+    .task-item:nth-child(4) { animation: slideIn 0.4s 0.81s ease forwards; }
+    .task-item:nth-child(5) { animation: slideIn 0.4s 0.94s ease forwards; }
+    .task-item:nth-child(6) { animation: slideIn 0.4s 1.07s ease forwards; }
+
+    .task-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+      min-width: 62px;
+      color: var(--muted);
+    }
+
+    .cat-blocker   .task-label { color: var(--bar-blocker); }
+    .cat-issue     .task-label { color: var(--bar-issue); }
+    .cat-delegated .task-label { color: var(--bar-delegated); }
+
+    .task-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .task-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .mention { color: var(--accent); }
+
+    .input-preview {
+      padding: 14px 20px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.5s 1.2s ease forwards;
+    }
+
+    .input-preview-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .input-preview-text {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 1.5px;
+      height: 13px;
+      background: var(--accent);
+      vertical-align: middle;
+      margin-left: 1px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ── Footer ── */
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 48px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.5s 0.5s ease forwards;
+    }
+
+    .footer-text, .footer-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      header { padding: 20px 24px; }
+      main { grid-template-columns: 1fr; }
+      .left { padding: 48px 24px; border-right: none; border-bottom: 1px solid var(--border); }
+      .right { padding: 40px 24px; }
+      footer { padding: 14px 24px; flex-direction: column; gap: 4px; text-align: center; }
+      h1 { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-bar"></div>
+      Briefing
+    </div>
+    <div class="status-pill">Coming soon</div>
+  </header>
+
+  <main>
+    <div class="left">
+      <div class="eyebrow">For engineering leaders</div>
+
+      <h1>Your team's noise,<br /><em>finally organized</em></h1>
+
+      <p class="body-text">
+        Blockers, decisions, follow-ups. Just type what's happening.
+        Briefing structures it into a private, actionable log so nothing slips through.
+      </p>
+
+      <!-- WAITLIST FORM — re-enable when Formspree is set up
+      <div class="form-wrapper">
+        <label class="form-label" for="email-input">Join the waitlist</label>
+
+        <div class="input-row" id="form-row">
+          <input
+            id="email-input"
+            class="email-input"
+            type="email"
+            placeholder="you@company.com"
+            autocomplete="email"
+          />
+          <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">
+            Get access
+          </button>
+        </div>
+
+        <div class="success-msg" id="success-msg">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="#3d7a57" stroke-width="1.5"/>
+            <path d="M5 8l2 2 4-4" stroke="#3d7a57" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          You're on the list. We'll reach out when it's ready.
+        </div>
+
+        <p class="form-note">No spam. Just a heads-up when we launch.</p>
+      </div>
+      -->
+
+      <div class="form-wrapper">
+        <p class="form-note">Waitlist opening soon. Check back shortly.</p>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="task-feed">
+        <div class="feed-header">Today · 5 tasks captured</div>
+
+        <div class="task-item cat-blocker">
+          <span class="task-label">Blocker</span>
+          <div>
+            <div class="task-text">Payment service can't connect to staging DB. Deploy blocked since 10am.</div>
+            <div class="task-meta">9 minutes ago</div>
+          </div>
+        </div>
+
+        <div class="task-item cat-issue">
+          <span class="task-label">Issue</span>
+          <div>
+            <div class="task-text">iOS build times jumped to 18 min. Investigate caching.</div>
+            <div class="task-meta">42 minutes ago</div>
+          </div>
+        </div>
+
+        <div class="task-item cat-delegated">
+          <span class="task-label">Delegated</span>
+          <div>
+            <div class="task-text"><span class="mention">@Marco</span> to follow up with platform team on rate limiting spec</div>
+            <div class="task-meta">1 hour ago</div>
+          </div>
+        </div>
+
+        <div class="task-item cat-pending">
+          <span class="task-label">Pending</span>
+          <div>
+            <div class="task-text">Performance review cycle next week. Pull 360 data.</div>
+            <div class="task-meta">2 hours ago</div>
+          </div>
+        </div>
+
+        <div class="task-item cat-pending">
+          <span class="task-label">Pending</span>
+          <div>
+            <div class="task-text">Prep agenda for all-hands Thursday</div>
+            <div class="task-meta">3 hours ago</div>
+          </div>
+        </div>
+
+        <div class="input-preview">
+          <div class="input-preview-label">You type → Briefing organizes</div>
+          <div class="input-preview-text">
+            auth broken on prod, rj is on it. marco needs to chase platform on rate limits. prep for thursday all-hands<span class="cursor"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-text">briefingapp.com</div>
+    <div class="footer-tag">Built for EMs and tech leads</div>
+  </footer>
+
+  <!-- WAITLIST SCRIPT — re-enable when Formspree is set up
+  <script>
+    async function handleSubmit() {
+      const input = document.getElementById('email-input');
+      const btn = document.getElementById('submit-btn');
+      const formRow = document.getElementById('form-row');
+      const successMsg = document.getElementById('success-msg');
+
+      const email = input.value.trim();
+      if (!email || !email.includes('@')) {
+        input.style.outline = '2px solid #c94f4f';
+        input.focus();
+        setTimeout(() => { input.style.outline = ''; }, 1500);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        if (res.ok) {
+          formRow.style.display = 'none';
+          successMsg.classList.add('show');
+        } else {
+          throw new Error('Failed');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Get access';
+        btn.style.background = '#c94f4f';
+        setTimeout(() => { btn.style.background = ''; }, 2000);
+      }
+    }
+
+    document.getElementById('email-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleSubmit();
+    });
+  </script>
+  -->
+</body>
+</html>

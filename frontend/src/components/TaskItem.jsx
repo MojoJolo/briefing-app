@@ -18,8 +18,11 @@ export default function TaskItem({ id, text, done, strikethrough, fading, catego
   const [expanded, setExpanded] = useState(false)
   const [showLabelMenu, setShowLabelMenu] = useState(false)
   const [menuPos, setMenuPos] = useState(null)
+  const [showActionMenu, setShowActionMenu] = useState(false)
+  const [actionMenuPos, setActionMenuPos] = useState(null)
   const inputRef = useRef(null)
   const menuRef = useRef(null)
+  const actionMenuRef = useRef(null)
 
   useEffect(() => {
     if (editing) {
@@ -42,6 +45,21 @@ export default function TaskItem({ id, text, done, strikethrough, fading, catego
       document.removeEventListener('touchstart', handleClickOutside)
     }
   }, [showLabelMenu])
+
+  useEffect(() => {
+    if (!showActionMenu) return
+    function handleClickOutside(e) {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target)) {
+        setShowActionMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [showActionMenu])
 
   function handleDoubleClick(e) {
     e.stopPropagation()
@@ -67,9 +85,18 @@ export default function TaskItem({ id, text, done, strikethrough, fading, catego
     setEditing(false)
   }
 
+  function handleActionClick(e) {
+    e.stopPropagation()
+    if (!showActionMenu) {
+      const rect = actionMenuRef.current.getBoundingClientRect()
+      setActionMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right })
+    }
+    setShowActionMenu(prev => !prev)
+  }
+
   function handleRowClick(e) {
     if (editing) return
-    if (e.target.closest('.task-checkbox, .task-delete, .task-cat-wrapper, a')) return
+    if (e.target.closest('.task-checkbox, .task-action-wrapper, .task-cat-wrapper, a')) return
     const next = !expanded
     setExpanded(next)
     if (next && !comments) {
@@ -157,7 +184,30 @@ export default function TaskItem({ id, text, done, strikethrough, fading, catego
             {commentCount > 0 && (
               <span className="comment-count">{commentCount}</span>
             )}
-            <button className="task-delete" onClick={(e) => { e.stopPropagation(); onDelete(); }} aria-label="Delete task">✕</button>
+            <div className="task-action-wrapper" ref={actionMenuRef}>
+              <button className="task-action-btn" onClick={handleActionClick} aria-label="Task actions">⋮</button>
+              {showActionMenu && actionMenuPos && (
+                <div
+                  className="task-action-menu"
+                  style={{ position: 'fixed', top: actionMenuPos.top, right: actionMenuPos.right, margin: 0 }}
+                >
+                  <button
+                    className="task-action-option"
+                    onClick={(e) => { e.stopPropagation(); setShowActionMenu(false); setEditing(true); }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Rename
+                  </button>
+                  <button
+                    className="task-action-option task-action-option--delete"
+                    onClick={(e) => { e.stopPropagation(); setShowActionMenu(false); onDelete(); }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
