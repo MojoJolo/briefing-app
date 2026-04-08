@@ -1,4 +1,4 @@
-export default function InputBar({ value, onChange, onSubmit, disabled }) {
+export default function InputBar({ value, onChange, onSubmit, disabled, error }) {
   function handleSubmit() {
     if (value.trim()) {
       onSubmit(value.trim())
@@ -25,7 +25,7 @@ export default function InputBar({ value, onChange, onSubmit, disabled }) {
         autoFocus
       />
       <div className="input-footer">
-        <span className="input-hint">Shift + Enter for new line</span>
+        <span className="input-hint">{error ? <span className="input-error">{error}</span> : 'Shift + Enter for new line'}</span>
         <button
           className="submit-button"
           onClick={handleSubmit}

@@ -779,6 +779,10 @@ body {
   color: #a5a29d;
 }
 
+.input-error {
+  color: #c0392b;
+}
+
 .submit-button {
   display: flex;
   align-items: center;

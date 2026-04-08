@@ -13,6 +13,7 @@ function App() {
   const [input, setInput] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
   const [tab, setTab] = useState<'open' | 'done'>('open')
   const [justMarkedDone, setJustMarkedDone] = useState<Set<string>>(new Set())
@@ -44,6 +45,7 @@ function App() {
 
   async function handleSubmit(value: string) {
     setInput('')
+    setSubmitError(null)
     setLoading(true)
     try {
       const res = await fetch('/api/process', {
@@ -51,9 +53,13 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: value }),
       })
+      if (!res.ok) throw new Error('Request failed')
       const data = await res.json()
       const newTasks = data.tasks.map(toTask)
       setTasks(prev => [...newTasks, ...prev])
+    } catch {
+      setInput(value)
+      setSubmitError('Failed to submit. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -215,7 +221,7 @@ function App() {
       </main>
       {tab === 'open' && (
         <div className="app-input">
-          <InputBar value={input} onChange={setInput} onSubmit={handleSubmit} disabled={loading} />
+          <InputBar value={input} onChange={v => { setInput(v); setSubmitError(null) }} onSubmit={handleSubmit} disabled={loading} error={submitError} />
         </div>
       )}
     </div>
