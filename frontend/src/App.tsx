@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import TimelineView from './components/TimelineView'
 import InputBar from './components/InputBar'
 
-type Task = { id: string; text: string; status: number; createdAt: string; updatedAt: string; category: string; commentCount: number }
+type Task = { id: string; text: string; originalInput: string; showOriginal: boolean; status: number; createdAt: string; updatedAt: string; category: string; commentCount: number }
 type Comment = { id: string; task_id: string; comment: string; created_at: string; updated_at: string }
 
-function toTask(t: { id: string; task: string; category: string; status: number; created_at: string; updated_at: string; comment_count?: number }): Task {
-  return { id: t.id, text: t.task, status: t.status, createdAt: t.created_at, updatedAt: t.updated_at, category: t.category.toUpperCase(), commentCount: t.comment_count ?? 0 }
+function toTask(t: { id: string; task: string; original_input?: string; show_original?: boolean; category: string; status: number; created_at: string; updated_at: string; comment_count?: number }): Task {
+  return { id: t.id, text: t.task, originalInput: t.original_input ?? '', showOriginal: t.show_original ?? false, status: t.status, createdAt: t.created_at, updatedAt: t.updated_at, category: t.category.toUpperCase(), commentCount: t.comment_count ?? 0 }
 }
 
 function App() {
@@ -118,6 +118,16 @@ function App() {
     setTasks(prev => prev.map(t => t.id === id ? task : t))
   }
 
+  async function handleShowOriginalChange(id: string, showOriginal: boolean) {
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ show_original: showOriginal }),
+    })
+    const updated = await res.json()
+    setTasks(prev => prev.map(t => t.id === id ? toTask(updated) : t))
+  }
+
   async function handleDelete(id: string) {
     await fetch(`/api/tasks/${id}`, { method: 'DELETE' })
     setTasks(prev => prev.filter(t => t.id !== id))
@@ -212,6 +222,7 @@ function App() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onCategoryChange={handleCategoryChange}
+          onShowOriginalChange={handleShowOriginalChange}
           commentsMap={commentsMap}
           onFetchComments={handleFetchComments}
           onAddComment={handleAddComment}

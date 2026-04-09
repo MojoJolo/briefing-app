@@ -44,7 +44,7 @@ function buildBuckets(tasks, dateField, sortAsc) {
   return buckets
 }
 
-export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onEdit, onDelete, onCategoryChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onEdit, onDelete, onCategoryChange, onShowOriginalChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
 
   function renderTask(task, i, opts = {}) {
     return (
@@ -52,6 +52,8 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
         key={task.id ?? i}
         id={task.id}
         text={task.text}
+        originalInput={task.originalInput}
+        showOriginal={task.showOriginal}
         done={task.status === 1}
         strikethrough={opts.strikethrough}
         fading={opts.fading}
@@ -61,6 +63,7 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
         onEdit={(text) => onEdit(task.id, text)}
         onDelete={() => onDelete(task.id)}
         onCategoryChange={(cat) => onCategoryChange(task.id, cat)}
+        onShowOriginalChange={(val) => onShowOriginalChange(task.id, val)}
         comments={commentsMap[task.id]}
         onFetchComments={onFetchComments}
         onAddComment={onAddComment}

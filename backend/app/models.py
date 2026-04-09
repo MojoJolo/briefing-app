@@ -19,6 +19,8 @@ class TaskResponse(BaseModel):
     task: str
     category: str
     status: int
+    original_input: str
+    show_original: bool
     created_at: datetime
     updated_at: datetime
     comment_count: int = 0
@@ -28,6 +30,7 @@ class TaskUpdate(BaseModel):
     status: int | None = None
     task: str | None = None
     category: str | None = None
+    show_original: bool | None = None
 
 
 class ProcessResponse(BaseModel):

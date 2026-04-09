@@ -44,7 +44,7 @@ def health_check():
 async def get_tasks(db: asyncpg.Connection = Depends(get_db)):
     rows = await db.fetch(
         """
-        SELECT t.id, t.task, t.category, t.status, t.created_at, t.updated_at,
+        SELECT t.id, t.task, t.category, t.status, t.original_input, t.show_original, t.created_at, t.updated_at,
                COALESCE(c.cnt, 0) AS comment_count
         FROM tasks t
         LEFT JOIN (SELECT task_id, COUNT(*) AS cnt FROM comments GROUP BY task_id) c ON c.task_id = t.id
@@ -64,9 +64,10 @@ async def update_task(task_id: UUID, body: TaskUpdate, db: asyncpg.Connection = 
                 status = COALESCE($1, status),
                 task = COALESCE($2, task),
                 category = COALESCE($3, category),
+                show_original = COALESCE($4, show_original),
                 updated_at = NOW()
-            WHERE id = $4
-            RETURNING id, task, category, status, created_at, updated_at
+            WHERE id = $5
+            RETURNING id, task, category, status, original_input, show_original, created_at, updated_at
         )
         SELECT u.*, COALESCE(c.cnt, 0) AS comment_count
         FROM updated u
@@ -75,6 +76,7 @@ async def update_task(task_id: UUID, body: TaskUpdate, db: asyncpg.Connection = 
         body.status,
         body.task,
         body.category,
+        body.show_original,
         task_id,
     )
     return TaskResponse(**row)
@@ -94,13 +96,14 @@ async def process_input(body: ProcessRequest, db: asyncpg.Connection = Depends(g
 
     rows = await db.fetch(
         """
-        INSERT INTO tasks (task, category)
-        SELECT t.task, t.category
-        FROM unnest($1::text[], $2::text[]) AS t(task, category)
-        RETURNING id, task, category, status, created_at, updated_at
+        INSERT INTO tasks (task, category, original_input)
+        SELECT t.task, t.category, t.original_input
+        FROM unnest($1::text[], $2::text[], $3::text[]) AS t(task, category, original_input)
+        RETURNING id, task, category, status, original_input, show_original, created_at, updated_at
         """,
         [t.text for t in tasks],
         [t.category.lower() for t in tasks],
+        [body.input] * len(tasks),
     )
 
     return ProcessResponse(tasks=[TaskResponse(**row) for row in rows])

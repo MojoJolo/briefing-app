@@ -11,7 +11,7 @@ const CATEGORY_OPTIONS = [
   { value: 'IDEA', label: '💡 Idea' },
 ]
 
-export default function TaskItem({ id, text, done, strikethrough, fading, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function TaskItem({ id, text, originalInput, showOriginal, done, strikethrough, fading, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, onShowOriginalChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
   const showDoneStyle = strikethrough !== undefined ? strikethrough : done
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(text)
@@ -20,6 +20,7 @@ export default function TaskItem({ id, text, done, strikethrough, fading, catego
   const [menuPos, setMenuPos] = useState(null)
   const [showActionMenu, setShowActionMenu] = useState(false)
   const [actionMenuPos, setActionMenuPos] = useState(null)
+  const robotMode = !showOriginal
   const inputRef = useRef(null)
   const menuRef = useRef(null)
   const actionMenuRef = useRef(null)
@@ -179,10 +180,29 @@ export default function TaskItem({ id, text, done, strikethrough, fading, catego
                 onClick={e => e.stopPropagation()}
               />
             ) : (
-              <span className="task-text" onDoubleClick={handleDoubleClick}>{renderTextWithLinks(text)}</span>
+              <span className="task-text" onDoubleClick={handleDoubleClick}>
+                {robotMode ? renderTextWithLinks(text) : (originalInput || text)}
+              </span>
             )}
             {commentCount > 0 && (
               <span className="comment-count">{commentCount}</span>
+            )}
+            {originalInput && (
+              <button
+                className={`task-robot-btn${robotMode ? '' : ' task-robot-btn--off'}`}
+                onClick={(e) => { e.stopPropagation(); onShowOriginalChange(!showOriginal) }}
+                aria-label="Toggle original text"
+                title={robotMode ? 'Show original text' : 'Show AI text'}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="8" width="18" height="13" rx="2"/>
+                  <line x1="12" y1="4" x2="12" y2="8"/>
+                  <circle cx="12" cy="3" r="1" fill="currentColor"/>
+                  <circle cx="9" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+                  <circle cx="15" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+                  <line x1="9" y1="18" x2="15" y2="18"/>
+                </svg>
+              </button>
             )}
             <div className="task-action-wrapper" ref={actionMenuRef}>
               <button className="task-action-btn" onClick={handleActionClick} aria-label="Task actions">⋮</button>

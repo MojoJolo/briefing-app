@@ -374,6 +374,56 @@ body {
   background: rgba(0, 0, 0, 0.04);
 }
 
+.task-robot-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  line-height: 1;
+  position: relative;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.task-item:hover .task-robot-btn {
+  opacity: 0.5;
+}
+
+.task-robot-btn:hover {
+  opacity: 1 !important;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.task-robot-btn--off {
+  opacity: 0.35 !important;
+}
+
+.task-item:hover .task-robot-btn--off {
+  opacity: 0.6;
+}
+
+.task-robot-btn--off:hover {
+  opacity: 1 !important;
+}
+
+.task-robot-btn--off::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 18px;
+  background: currentColor;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  border-radius: 1px;
+}
+
 .task-action-menu {
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.08);
