@@ -1146,19 +1146,68 @@ body {
   text-decoration: underline;
 }
 
-/* Sign-out button in header */
-.app-signout {
-  all: unset;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 12px;
-  color: #9ca3af;
-  padding: 4px 8px;
-  border-radius: 5px;
-  transition: color 0.15s, background 0.15s;
+/* 3-dot menu in header */
+.app-menu {
+  position: relative;
 }
 
-.app-signout:hover {
+.app-menu-btn {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.app-menu-btn span {
+  display: block;
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: #6b7280;
+  transition: background 0.15s;
+}
+
+.app-menu-btn:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+.app-menu-btn:hover span {
+  background: #374151;
+}
+
+.app-menu-popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  min-width: 130px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.app-menu-item {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  font-family: inherit;
+  font-size: 13px;
   color: #374151;
-  background: rgba(0,0,0,0.05);
+  box-sizing: border-box;
+  transition: background 0.1s;
+}
+
+.app-menu-item:hover {
+  background: #f5f4f2;
 }

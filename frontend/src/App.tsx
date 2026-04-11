@@ -21,9 +21,22 @@ function App() {
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
   const [tab, setTab] = useState<'open' | 'done'>('open')
   const [justMarkedDone, setJustMarkedDone] = useState<Set<string>>(new Set())
+  const [menuOpen, setMenuOpen] = useState(false)
   const contentRef = useRef<HTMLElement>(null)
   const scrolledRef = useRef(false)
   const doneTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [menuOpen])
 
   function getHeaders(): Record<string, string> {
     return {
@@ -230,7 +243,18 @@ function App() {
               onClick={() => setTab('done')}
             >Done</button>
           </div>
-          <button className="app-signout" onClick={signOut}>Sign out</button>
+          <div className="app-menu" ref={menuRef}>
+            <button className="app-menu-btn" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
+              <span /><span /><span />
+            </button>
+            {menuOpen && (
+              <div className="app-menu-popup">
+                <button className="app-menu-item" onClick={() => { setMenuOpen(false); signOut() }}>
+                  Sign out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         <div className="app-header-line" />
       </header>
