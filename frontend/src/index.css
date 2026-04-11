@@ -1073,8 +1073,13 @@ body {
     padding: 12px 14px 8px;
   }
 
-  .input-field {
-    font-size: 13px;
+  /* 16px minimum prevents iOS Safari from auto-zooming on input focus */
+  .input-field,
+  .task-edit-input,
+  .comment-edit-input,
+  .comment-input,
+  .auth-input {
+    font-size: 16px;
   }
 
   .app-input {
