@@ -1,40 +1,26 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-type Mode = 'login' | 'signup'
-
 export default function AuthPage() {
-  const [mode, setMode] = useState<Mode>('login')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    setMessage(null)
     setLoading(true)
     try {
-      if (mode === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) setError(error.message)
-        // On success, onAuthStateChange in AuthContext fires → app loads
-      } else {
-        const { error } = await supabase.auth.signUp({ email, password })
-        if (error) setError(error.message)
-        else setMessage('Check your email for a confirmation link.')
-      }
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: true },
+      })
+      if (error) setError(error.message)
+      else setSent(true)
     } finally {
       setLoading(false)
     }
-  }
-
-  function toggleMode() {
-    setMode(m => m === 'login' ? 'signup' : 'login')
-    setError(null)
-    setMessage(null)
   }
 
   return (
@@ -44,33 +30,31 @@ export default function AuthPage() {
           <span className="app-brand-mark" />
           <span className="app-title">Briefing</span>
         </div>
-        <form onSubmit={handleSubmit} className="auth-form">
-          <input
-            className="input-field auth-input"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            autoFocus
-          />
-          <input
-            className="input-field auth-input"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-          {error && <p className="auth-error">{error}</p>}
-          {message && <p className="auth-message">{message}</p>}
-          <button className="auth-submit" type="submit" disabled={loading}>
-            {loading ? 'Loading…' : mode === 'login' ? 'Sign in' : 'Create account'}
-          </button>
-        </form>
-        <button className="auth-toggle" onClick={toggleMode}>
-          {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-        </button>
+        {sent ? (
+          <div className="auth-sent">
+            <p className="auth-sent-title">Check your email</p>
+            <p className="auth-sent-hint">We sent a magic link to <strong>{email}</strong>. Click it to sign in.</p>
+            <button className="auth-toggle" onClick={() => { setSent(false); setEmail('') }}>
+              Use a different email
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="auth-form">
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              autoFocus
+            />
+            {error && <p className="auth-error">{error}</p>}
+            <button className="auth-submit" type="submit" disabled={loading}>
+              {loading ? 'Sending…' : 'Send magic link'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   )
