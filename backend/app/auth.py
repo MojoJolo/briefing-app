@@ -30,6 +30,7 @@ async def get_current_user_id(
     try:
         header = jwt.get_unverified_header(token)
         alg = header.get("alg", "HS256")
+        print(f"[auth] alg={alg} SUPABASE_URL={bool(settings.SUPABASE_URL)} JWT_SECRET={bool(settings.SUPABASE_JWT_SECRET)}", flush=True)
 
         if alg == "HS256":
             if not settings.SUPABASE_JWT_SECRET:
@@ -59,6 +60,7 @@ async def get_current_user_id(
     except jwt.InvalidSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
     except jwt.InvalidTokenError as e:
+        print(f"[auth] InvalidTokenError type={type(e).__name__} msg={e}", flush=True)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token: {e}")
 
     sub = payload.get("sub")
