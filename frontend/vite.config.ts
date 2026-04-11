@@ -47,6 +47,7 @@ export default defineConfig({
   ],
   server: {
     port: 5183,
+    allowedHosts: ['app.briefingapp.com'],
     proxy: {
       '/api': {
         target: 'http://backend:8010',
