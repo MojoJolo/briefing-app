@@ -1,19 +1,12 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-// True when the app is running as an installed PWA on iOS (standalone mode).
-// In this case magic links open in Safari instead of the PWA, so we need
-// to guide the user back and let them manually trigger a session check.
-const isIOSPWA =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-  !!(window.navigator as Navigator & { standalone?: boolean }).standalone
-
 export default function AuthPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [checkMessage, setCheckMessage] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -22,14 +15,7 @@ export default function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: {
-          shouldCreateUser: true,
-          // After the user clicks the link in Safari, Supabase redirects back to
-          // this origin. The implicit-flow tokens land in the URL hash so the
-          // app can establish a session even when running in a different context
-          // (Safari vs. the installed PWA).
-          emailRedirectTo: window.location.origin,
-        },
+        options: { shouldCreateUser: true },
       })
       if (error) setError(error.message)
       else setSent(true)
@@ -38,19 +24,17 @@ export default function AuthPage() {
     }
   }
 
-  // Called by the iOS "I've clicked the link" button.
-  // On iOS 16.4+ Safari and the PWA share localStorage, so the session that
-  // was written by Safari is already readable here.
-  async function handleCheckSession() {
-    setCheckMessage(null)
+  async function handleVerify(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
     setLoading(true)
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        setCheckMessage("No sign-in found yet — make sure you tapped the link in your email first, then try again.")
-      }
-      // If a session was found, onAuthStateChange in AuthContext fires and the
-      // app transitions to the authenticated view automatically.
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: code.trim(),
+        type: 'email',
+      })
+      if (error) setError(error.message)
     } finally {
       setLoading(false)
     }
@@ -64,30 +48,28 @@ export default function AuthPage() {
           <span className="app-title">Briefing</span>
         </div>
         {sent ? (
-          <div className="auth-sent">
+          <form onSubmit={handleVerify} className="auth-form">
             <p className="auth-sent-title">Check your email</p>
-            <p className="auth-sent-hint">We sent a magic link to <strong>{email}</strong>. Click it to sign in.</p>
-
-            {isIOSPWA && (
-              <div className="auth-ios-hint">
-                <p className="auth-ios-hint-text">
-                  On iPhone, the link will open in <strong>Safari</strong>. After signing in there, come back to this app and tap the button below.
-                </p>
-                <button
-                  className="auth-submit"
-                  onClick={handleCheckSession}
-                  disabled={loading}
-                >
-                  {loading ? 'Checking…' : "I've clicked the link — sign me in"}
-                </button>
-                {checkMessage && <p className="auth-error">{checkMessage}</p>}
-              </div>
-            )}
-
-            <button className="auth-toggle" onClick={() => { setSent(false); setEmail(''); setCheckMessage(null) }}>
+            <p className="auth-sent-hint">We sent a 6-digit code to <strong>{email}</strong>.</p>
+            <input
+              className="auth-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="000000"
+              maxLength={6}
+              value={code}
+              onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
+              required
+              autoFocus
+            />
+            {error && <p className="auth-error">{error}</p>}
+            <button className="auth-submit" type="submit" disabled={loading || code.length < 6}>
+              {loading ? 'Verifying…' : 'Sign in'}
+            </button>
+            <button className="auth-toggle" type="button" onClick={() => { setSent(false); setEmail(''); setCode('') }}>
               Use a different email
             </button>
-          </div>
+          </form>
         ) : (
           <form onSubmit={handleSubmit} className="auth-form">
             <input
@@ -101,7 +83,7 @@ export default function AuthPage() {
             />
             {error && <p className="auth-error">{error}</p>}
             <button className="auth-submit" type="submit" disabled={loading}>
-              {loading ? 'Sending…' : 'Send magic link'}
+              {loading ? 'Sending…' : 'Send code'}
             </button>
           </form>
         )}

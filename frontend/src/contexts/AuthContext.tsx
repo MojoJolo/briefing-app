@@ -27,26 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session)
     })
 
-    // iOS PWA fix: when the user clicks a magic link the OS opens it in Safari,
-    // not in the PWA. On iOS 16.4+ Safari and the installed PWA share the same
-    // localStorage origin, so once the session is written by Safari the PWA can
-    // read it — but only if it actively re-queries. We listen for visibilitychange
-    // so that the moment the user switches back to the home-screen app we
-    // re-check for a session and log them in automatically.
-    function handleVisibilityChange() {
-      if (document.visibilityState === 'visible') {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          setSession(session)
-        })
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-
-    return () => {
-      subscription.unsubscribe()
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
   async function signOut() {
