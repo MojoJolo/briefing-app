@@ -1060,12 +1060,12 @@ body {
   width: 100%;
   max-width: 360px;
   background: #fff;
-  border-radius: 12px;
-  padding: 32px 28px 24px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  border-radius: 14px;
+  padding: 36px 32px 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.07);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .auth-card .app-brand {
@@ -1080,18 +1080,44 @@ body {
 
 .auth-input {
   width: 100%;
-  padding: 9px 12px;
+  padding: 10px 14px;
   font-size: 14px;
-  border: 1px solid rgba(0,0,0,0.15);
-  border-radius: 7px;
+  font-family: inherit;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  border-radius: 8px;
   background: #fafaf9;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
+  box-sizing: border-box;
 }
 
 .auth-input:focus {
   border-color: #6366F1;
   background: #fff;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 11px;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: #6366F1;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+.auth-submit:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .auth-error {
@@ -1113,6 +1139,7 @@ body {
   font-size: 13px;
   color: #6366F1;
   text-align: center;
+  display: block;
 }
 
 .auth-toggle:hover {

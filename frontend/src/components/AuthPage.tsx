@@ -64,7 +64,7 @@ export default function AuthPage() {
           />
           {error && <p className="auth-error">{error}</p>}
           {message && <p className="auth-message">{message}</p>}
-          <button className="submit-button" type="submit" disabled={loading}>
+          <button className="auth-submit" type="submit" disabled={loading}>
             {loading ? 'Loading…' : mode === 'login' ? 'Sign in' : 'Create account'}
           </button>
         </form>
