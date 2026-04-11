@@ -118,7 +118,7 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
           <path d="M17 18h14M17 24h14M17 30h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         </svg>
         <p className="empty-state-title">Your plate is clear</p>
-        <p className="empty-state-hint">Type anything below — tasks, blockers, ideas — and AI will sort it out</p>
+        <p className="empty-state-hint">Type anything below. Tasks, blockers, ideas. AI will sort it out.</p>
       </div>
     )
   }
