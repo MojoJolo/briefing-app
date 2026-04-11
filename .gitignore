@@ -15,7 +15,9 @@ env/
 # Node
 node_modules/
 frontend/dist/
+frontend/dev-dist/
 frontend/.vite/
+frontend/.env.local
 
 # IDE
 .vscode/
