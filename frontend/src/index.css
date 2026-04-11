@@ -1040,3 +1040,98 @@ body {
     padding-bottom: 20px;
   }
 }
+
+/* Auth page */
+.app-loading {
+  height: 100%;
+  background: #f0eeeb;
+}
+
+.auth-page {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0eeeb;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 28px 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-card .app-brand {
+  justify-content: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 14px;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 7px;
+  background: #fafaf9;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.auth-input:focus {
+  border-color: #6366F1;
+  background: #fff;
+}
+
+.auth-error {
+  margin: 0;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.auth-message {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.auth-toggle {
+  all: unset;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: #6366F1;
+  text-align: center;
+}
+
+.auth-toggle:hover {
+  text-decoration: underline;
+}
+
+/* Sign-out button in header */
+.app-signout {
+  all: unset;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 4px 8px;
+  border-radius: 5px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.app-signout:hover {
+  color: #374151;
+  background: rgba(0,0,0,0.05);
+}

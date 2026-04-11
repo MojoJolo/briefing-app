@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     # Supabase / PostgreSQL
     DATABASE_URL: str = ""
 
+    # Supabase Auth
+    SUPABASE_JWT_SECRET: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @model_validator(mode="after")
