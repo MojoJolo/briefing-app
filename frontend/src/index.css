@@ -922,6 +922,41 @@ body {
   animation: spin 0.7s linear infinite;
 }
 
+/* Empty state */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  text-align: center;
+  color: #c0bdb8;
+  gap: 8px;
+}
+
+.empty-state-icon {
+  width: 44px;
+  height: 44px;
+  color: #d5d2cd;
+  margin-bottom: 4px;
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #a8a49f;
+}
+
+.empty-state-hint {
+  margin: 0;
+  font-size: 13px;
+  color: #c0bdb8;
+  max-width: 240px;
+  line-height: 1.5;
+}
+
 /* Empty state for sections with no tasks */
 .task-list-empty {
   font-size: 13px;
