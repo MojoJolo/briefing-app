@@ -11,7 +11,13 @@ MIGRATIONS_DIR = Path(__file__).parent.parent / "migrations"
 
 async def connect():
     global _pool
-    _pool = await asyncpg.create_pool(settings.DATABASE_URL)
+    _is_supabase = "supabase" in settings.DATABASE_URL
+    _ssl = "require" if _is_supabase else None
+    _pool = await asyncpg.create_pool(
+        settings.DATABASE_URL,
+        ssl=_ssl,
+        statement_cache_size=0 if _is_supabase else 100,
+    )
     await _run_migrations()
 
 
