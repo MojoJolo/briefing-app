@@ -233,27 +233,32 @@ function App() {
             <span className="app-brand-mark" />
             <span className="app-title">Briefing</span>
           </div>
-          <div className="app-tabs">
-            <button
-              className={`app-tab${tab === 'open' ? ' app-tab--active' : ''}`}
-              onClick={() => setTab('open')}
-            >Open</button>
-            <button
-              className={`app-tab${tab === 'done' ? ' app-tab--active' : ''}`}
-              onClick={() => setTab('done')}
-            >Done</button>
-          </div>
-          <div className="app-menu" ref={menuRef}>
-            <button className="app-menu-btn" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
-              <span /><span /><span />
-            </button>
-            {menuOpen && (
-              <div className="app-menu-popup">
-                <button className="app-menu-item" onClick={() => { setMenuOpen(false); signOut() }}>
-                  Sign out
-                </button>
-              </div>
-            )}
+          <div className="app-header-right">
+            <div className="app-tabs">
+              <button
+                className={`app-tab${tab === 'open' ? ' app-tab--active' : ''}`}
+                onClick={() => setTab('open')}
+              >Open</button>
+              <button
+                className={`app-tab${tab === 'done' ? ' app-tab--active' : ''}`}
+                onClick={() => setTab('done')}
+              >Done</button>
+            </div>
+            <div className="app-menu" ref={menuRef}>
+              <button className="app-menu-btn" onClick={() => setMenuOpen(o => !o)} aria-label="Account">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="5" r="2.75" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M2.5 13.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+              {menuOpen && (
+                <div className="app-menu-popup">
+                  <button className="app-menu-item" onClick={() => { setMenuOpen(false); signOut() }}>
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="app-header-line" />
