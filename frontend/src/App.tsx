@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import TimelineView from './components/TimelineView'
 import InputBar from './components/InputBar'
+import AuthPage from './components/AuthPage'
+import { useAuth } from './contexts/AuthContext'
 
 type Task = { id: string; text: string; originalInput: string; showOriginal: boolean; status: number; createdAt: string; updatedAt: string; category: string; commentCount: number }
 type Comment = { id: string; task_id: string; comment: string; created_at: string; updated_at: string }
@@ -10,6 +12,8 @@ function toTask(t: { id: string; task: string; original_input?: string; show_ori
 }
 
 function App() {
+  const { session, loading: authLoading, signOut } = useAuth()
+
   const [input, setInput] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(false)
@@ -17,17 +21,38 @@ function App() {
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
   const [tab, setTab] = useState<'open' | 'done'>('open')
   const [justMarkedDone, setJustMarkedDone] = useState<Set<string>>(new Set())
+  const [menuOpen, setMenuOpen] = useState(false)
   const contentRef = useRef<HTMLElement>(null)
   const scrolledRef = useRef(false)
   const doneTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    fetch('/api/tasks')
+    if (!menuOpen) return
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [menuOpen])
+
+  function getHeaders(): Record<string, string> {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session!.access_token}`,
+    }
+  }
+
+  useEffect(() => {
+    if (!session) return
+    fetch('/api/tasks', { headers: getHeaders() })
       .then(res => res.json())
       .then((raw: { id: string; task: string; category: string; status: number; created_at: string; updated_at: string; comment_count?: number }[]) => {
         setTasks(raw.map(toTask))
       })
-  }, [])
+  }, [session])
 
   useEffect(() => {
     if (tasks.length > 0 && !scrolledRef.current && contentRef.current) {
@@ -50,7 +75,7 @@ function App() {
     try {
       const res = await fetch('/api/process', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(),
         body: JSON.stringify({ input: value }),
       })
       if (!res.ok) throw new Error('Request failed')
@@ -69,7 +94,7 @@ function App() {
     const newStatus = currentStatus === 1 ? 0 : 1
     const res = await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ status: newStatus }),
     })
     const updated = await res.json()
@@ -99,7 +124,7 @@ function App() {
   async function handleCategoryChange(id: string, newCategory: string) {
     const res = await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ category: newCategory }),
     })
     const updated = await res.json()
@@ -110,7 +135,7 @@ function App() {
   async function handleEdit(id: string, text: string) {
     const res = await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ task: text }),
     })
     const updated = await res.json()
@@ -121,7 +146,7 @@ function App() {
   async function handleShowOriginalChange(id: string, showOriginal: boolean) {
     const res = await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ show_original: showOriginal }),
     })
     const updated = await res.json()
@@ -129,13 +154,13 @@ function App() {
   }
 
   async function handleDelete(id: string) {
-    await fetch(`/api/tasks/${id}`, { method: 'DELETE' })
+    await fetch(`/api/tasks/${id}`, { method: 'DELETE', headers: getHeaders() })
     setTasks(prev => prev.filter(t => t.id !== id))
   }
 
   // Comment handlers
   async function handleFetchComments(taskId: string) {
-    const res = await fetch(`/api/tasks/${taskId}/comments`)
+    const res = await fetch(`/api/tasks/${taskId}/comments`, { headers: getHeaders() })
     const data = await res.json()
     setCommentsMap(prev => ({ ...prev, [taskId]: data }))
   }
@@ -147,7 +172,7 @@ function App() {
   async function handleAddComment(taskId: string, comment: string) {
     const res = await fetch(`/api/tasks/${taskId}/comments`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ comment }),
     })
     const newComment = await res.json()
@@ -161,7 +186,7 @@ function App() {
   async function handleEditComment(commentId: string, comment: string) {
     const res = await fetch(`/api/comments/${commentId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ comment }),
     })
     const updated = await res.json()
@@ -182,7 +207,7 @@ function App() {
         break
       }
     }
-    await fetch(`/api/comments/${commentId}`, { method: 'DELETE' })
+    await fetch(`/api/comments/${commentId}`, { method: 'DELETE', headers: getHeaders() })
     if (taskId) {
       setCommentsMap(prev => ({
         ...prev,
@@ -190,6 +215,14 @@ function App() {
       }))
       updateCommentCount(taskId, -1)
     }
+  }
+
+  if (authLoading) {
+    return <div className="app-loading" />
+  }
+
+  if (!session) {
+    return <AuthPage />
   }
 
   return (
@@ -200,15 +233,32 @@ function App() {
             <span className="app-brand-mark" />
             <span className="app-title">Briefing</span>
           </div>
-          <div className="app-tabs">
-            <button
-              className={`app-tab${tab === 'open' ? ' app-tab--active' : ''}`}
-              onClick={() => setTab('open')}
-            >Open</button>
-            <button
-              className={`app-tab${tab === 'done' ? ' app-tab--active' : ''}`}
-              onClick={() => setTab('done')}
-            >Done</button>
+          <div className="app-header-right">
+            <div className="app-tabs">
+              <button
+                className={`app-tab${tab === 'open' ? ' app-tab--active' : ''}`}
+                onClick={() => setTab('open')}
+              >Open</button>
+              <button
+                className={`app-tab${tab === 'done' ? ' app-tab--active' : ''}`}
+                onClick={() => setTab('done')}
+              >Done</button>
+            </div>
+            <div className="app-menu" ref={menuRef}>
+              <button className="app-menu-btn" onClick={() => setMenuOpen(o => !o)} aria-label="Account">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="5" r="2.75" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M2.5 13.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+              {menuOpen && (
+                <div className="app-menu-popup">
+                  <button className="app-menu-item" onClick={() => { setMenuOpen(false); signOut() }}>
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="app-header-line" />
