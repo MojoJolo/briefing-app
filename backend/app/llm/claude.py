@@ -3,50 +3,69 @@ import anthropic
 from app.llm.base import LLMProvider
 from app.models import Task
 
-SYSTEM_PROMPT = """\
+_BASE_INSTRUCTIONS = """\
 You are a task parser for a work briefing app. Given free-form input from a user, \
-extract one or more actionable tasks. Most tasks should have no label (empty string). \
-Only assign a label when the text clearly implies one.
+extract one or more actionable tasks.
 
 For each task return:
-- text: fix spelling errors and unclear phrasing only. Do not change the grammatical structure or voice of the input — if the user writes a noun phrase, keep it a noun phrase; do not convert to imperative form. Always preserve URLs and links exactly as provided. For DELEGATED tasks, always preserve the person's name exactly as written.
-- category: a label for the task. Use "" (empty string) for normal tasks. Only assign a label when clearly implied:
-  - BLOCKER: progress is blocked (e.g. "blocked", "cannot proceed", "failing", "stuck because")
-  - ISSUE: a problem needing investigation (e.g. "issue", "bug", "investigate", "check why")
-  - PENDING: waiting or follow-up needed (e.g. "follow up", "waiting for", "pending reply", "check back later")
-  - DELEGATED: another person is expected to do the work (e.g. "X to check", "ask X to", "Gene to investigate", "Kris to confirm"). Always keep the person's name in the text.
-  - IDEA: a suggestion, proposal, or thing to consider (e.g. "idea", "what if", "we could", "might be worth")
-  - "": everything else — most tasks should use this
-
-Do not force classification. When in doubt, leave the category as "".
+- text: fix spelling errors and unclear phrasing only. Do not change the grammatical \
+structure or voice of the input — if the user writes a noun phrase, keep it a noun phrase; \
+do not convert to imperative form. Always preserve URLs and links exactly as provided.
+- category: a label name for the task (see below).
 
 Always call the extract_tasks tool with your result.\
 """
 
-TOOL = {
-    "name": "extract_tasks",
-    "description": "Extract and classify tasks from the user's input.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "tasks": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "text": {"type": "string"},
-                        "category": {
-                            "type": "string",
-                            "enum": ["BLOCKER", "ISSUE", "PENDING", "DELEGATED", "IDEA", ""],
+_NO_LABELS_INSTRUCTIONS = """\
+No labels are configured. Use empty string "" for category on all tasks.\
+"""
+
+
+def _build_system_prompt(labels: list[dict]) -> str:
+    if not labels:
+        return f"{_BASE_INSTRUCTIONS}\n\n{_NO_LABELS_INSTRUCTIONS}"
+
+    lines = [
+        f"{_BASE_INSTRUCTIONS}",
+        "",
+        "Available labels — only assign when clearly implied by the text. Most tasks should use \"\" (no label):",
+    ]
+    for label in labels:
+        desc = label.get("description", "").strip()
+        if desc:
+            lines.append(f'- "{label["name"]}": {desc}')
+        else:
+            lines.append(f'- "{label["name"]}"')
+    lines.append('- "": everything else — most tasks should use this')
+    return "\n".join(lines)
+
+
+def _build_tool(labels: list[dict]) -> dict:
+    category_enum = [""] + [label["name"] for label in labels]
+    return {
+        "name": "extract_tasks",
+        "description": "Extract and classify tasks from the user's input.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "text": {"type": "string"},
+                            "category": {
+                                "type": "string",
+                                "enum": category_enum,
+                            },
                         },
+                        "required": ["text", "category"],
                     },
-                    "required": ["text", "category"],
-                },
-            }
+                }
+            },
+            "required": ["tasks"],
         },
-        "required": ["tasks"],
-    },
-}
+    }
 
 
 class ClaudeProvider(LLMProvider):
@@ -54,12 +73,15 @@ class ClaudeProvider(LLMProvider):
         self._client = anthropic.AsyncAnthropic(api_key=api_key)
         self._model = model
 
-    async def process(self, text: str) -> list[Task]:
+    async def process(self, text: str, labels: list[dict]) -> list[Task]:
+        system_prompt = _build_system_prompt(labels)
+        tool = _build_tool(labels)
+
         response = await self._client.messages.create(
             model=self._model,
             max_tokens=1024,
-            system=SYSTEM_PROMPT,
-            tools=[TOOL],
+            system=system_prompt,
+            tools=[tool],
             tool_choice={"type": "tool", "name": "extract_tasks"},
             messages=[{"role": "user", "content": text}],
         )

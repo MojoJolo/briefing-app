@@ -2,16 +2,10 @@ import { useState, useRef, useEffect } from 'react'
 import { renderTextWithLinks } from '../utils/renderLinks'
 import CommentSection from './CommentSection'
 
-const CATEGORY_OPTIONS = [
-  { value: '', label: '—' },
-  { value: 'BLOCKER', label: '🚨 Blocker' },
-  { value: 'ISSUE', label: '🐛 Issue' },
-  { value: 'PENDING', label: '⏳ Pending' },
-  { value: 'DELEGATED', label: '👤 Delegated' },
-  { value: 'IDEA', label: '💡 Idea' },
-]
+const ITEM_H = 36
+const MENU_PADDING = 16
 
-export default function TaskItem({ id, text, originalInput, showOriginal, done, strikethrough, fading, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, onShowOriginalChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function TaskItem({ id, text, originalInput, showOriginal, done, strikethrough, fading, labelId, labelName, labelColor, labels, commentCount, onToggle, onEdit, onDelete, onLabelChange, onShowOriginalChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
   const showDoneStyle = strikethrough !== undefined ? strikethrough : done
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(text)
@@ -110,25 +104,31 @@ export default function TaskItem({ id, text, originalInput, showOriginal, done, 
     if (!showLabelMenu) {
       const rect = menuRef.current.getBoundingClientRect()
       const isMobile = window.innerWidth <= 640
-      setMenuPos(isMobile
-        ? { top: rect.bottom + 4, left: rect.left }
-        : { top: rect.top, left: rect.right + 8 }
-      )
+      // Estimate menu height: (labels.length + 1 for "no label" option) * item height + padding
+      const estimatedH = (labels.length + 1) * ITEM_H + MENU_PADDING
+
+      if (isMobile) {
+        const spaceBelow = window.innerHeight - rect.bottom
+        if (spaceBelow >= estimatedH) {
+          setMenuPos({ top: rect.bottom + 4, left: rect.left })
+        } else {
+          setMenuPos({ bottom: window.innerHeight - rect.top + 4, top: 'auto', left: rect.left })
+        }
+      } else {
+        const clampedTop = Math.min(rect.top, window.innerHeight - estimatedH - 8)
+        setMenuPos({ top: Math.max(8, clampedTop), left: rect.right + 8 })
+      }
     }
     setShowLabelMenu(prev => !prev)
   }
 
-  function handleLabelSelect(cat) {
+  function handleLabelSelect(id) {
     setShowLabelMenu(false)
-    if (cat !== category) {
-      onCategoryChange(cat)
-    }
+    onLabelChange(id)
   }
 
-  const catSlug = (category || 'none').toLowerCase()
-  const catName = category
-    ? CATEGORY_OPTIONS.find(o => o.value === category)?.label.split(' ').slice(1).join(' ')
-    : null
+  const stripColor = labelColor || null
+  const hasLabel = !!labelId
 
   return (
     <div className={`task-item-wrapper${expanded ? ' task-item-wrapper--expanded' : ''}${fading ? ' task-item-wrapper--fading' : ''}`}>
@@ -136,25 +136,43 @@ export default function TaskItem({ id, text, originalInput, showOriginal, done, 
 
         <div className="task-cat-wrapper" ref={menuRef}>
           <button
-            className={`task-cat-btn task-cat-btn--${catSlug}`}
+            className={`task-cat-btn${hasLabel ? '' : ' task-cat-btn--none'}`}
             onClick={handleLabelClick}
             aria-label="Change task label"
           >
-            <span className="task-cat-text">{catName || '+ label'}</span>
-            <span className="task-cat-strip" />
+            <span className="task-cat-text">{labelName || '+ label'}</span>
+            <span
+              className="task-cat-strip"
+              style={stripColor ? { background: stripColor } : undefined}
+            />
           </button>
           {showLabelMenu && menuPos && (
             <div
               className="task-label-menu"
-              style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, margin: 0 }}
+              style={{
+                position: 'fixed',
+                top: menuPos.top,
+                bottom: menuPos.bottom,
+                left: menuPos.left,
+                margin: 0,
+                maxHeight: '60vh',
+                overflowY: 'auto',
+              }}
             >
-              {CATEGORY_OPTIONS.map(opt => (
+              <button
+                className={`task-label-option${!labelId ? ' task-label-option--selected' : ''}`}
+                onClick={(e) => { e.stopPropagation(); handleLabelSelect(null) }}
+              >
+                — No label
+              </button>
+              {labels.map(opt => (
                 <button
-                  key={opt.value}
-                  className={`task-label-option${opt.value === category ? ' task-label-option--selected' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); handleLabelSelect(opt.value); }}
+                  key={opt.id}
+                  className={`task-label-option${opt.id === labelId ? ' task-label-option--selected' : ''}`}
+                  onClick={(e) => { e.stopPropagation(); handleLabelSelect(opt.id) }}
                 >
-                  {opt.label}
+                  <span className="task-label-option-dot" style={{ background: opt.color }} />
+                  {opt.name}
                 </button>
               ))}
             </div>

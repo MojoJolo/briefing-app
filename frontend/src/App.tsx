@@ -2,13 +2,28 @@ import { useState, useEffect, useRef } from 'react'
 import TimelineView from './components/TimelineView'
 import InputBar from './components/InputBar'
 import AuthPage from './components/AuthPage'
+import LabelsManager from './components/LabelsManager'
 import { useAuth } from './contexts/AuthContext'
 
-type Task = { id: string; text: string; originalInput: string; showOriginal: boolean; status: number; createdAt: string; updatedAt: string; category: string; commentCount: number }
+type Label = { id: string; name: string; color: string; description: string }
+type Task = { id: string; text: string; originalInput: string; showOriginal: boolean; status: number; createdAt: string; updatedAt: string; category: string; commentCount: number; labelId: string | null; labelName: string | null; labelColor: string | null }
 type Comment = { id: string; task_id: string; comment: string; created_at: string; updated_at: string }
 
-function toTask(t: { id: string; task: string; original_input?: string; show_original?: boolean; category: string; status: number; created_at: string; updated_at: string; comment_count?: number }): Task {
-  return { id: t.id, text: t.task, originalInput: t.original_input ?? '', showOriginal: t.show_original ?? false, status: t.status, createdAt: t.created_at, updatedAt: t.updated_at, category: t.category.toUpperCase(), commentCount: t.comment_count ?? 0 }
+function toTask(t: { id: string; task: string; original_input?: string; show_original?: boolean; category: string; status: number; created_at: string; updated_at: string; comment_count?: number; label_id?: string | null; label_name?: string | null; label_color?: string | null }): Task {
+  return {
+    id: t.id,
+    text: t.task,
+    originalInput: t.original_input ?? '',
+    showOriginal: t.show_original ?? false,
+    status: t.status,
+    createdAt: t.created_at,
+    updatedAt: t.updated_at,
+    category: t.category,
+    commentCount: t.comment_count ?? 0,
+    labelId: t.label_id ?? null,
+    labelName: t.label_name ?? null,
+    labelColor: t.label_color ?? null,
+  }
 }
 
 function App() {
@@ -16,12 +31,14 @@ function App() {
 
   const [input, setInput] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
+  const [labels, setLabels] = useState<Label[]>([])
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
   const [tab, setTab] = useState<'open' | 'done'>('open')
   const [justMarkedDone, setJustMarkedDone] = useState<Set<string>>(new Set())
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showLabelsManager, setShowLabelsManager] = useState(false)
   const contentRef = useRef<HTMLElement>(null)
   const scrolledRef = useRef(false)
   const doneTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
@@ -49,9 +66,10 @@ function App() {
     if (!session) return
     fetch('/api/tasks', { headers: getHeaders() })
       .then(res => res.json())
-      .then((raw: { id: string; task: string; category: string; status: number; created_at: string; updated_at: string; comment_count?: number }[]) => {
-        setTasks(raw.map(toTask))
-      })
+      .then((raw: Parameters<typeof toTask>[0][]) => setTasks(raw.map(toTask)))
+    fetch('/api/labels', { headers: getHeaders() })
+      .then(res => res.json())
+      .then((raw: Label[]) => setLabels(raw))
   }, [session])
 
   useEffect(() => {
@@ -66,7 +84,6 @@ function App() {
       contentRef.current.scrollTop = contentRef.current.scrollHeight
     }
   }, [tab])
-
 
   async function handleSubmit(value: string) {
     setInput('')
@@ -121,15 +138,17 @@ function App() {
     }
   }
 
-  async function handleCategoryChange(id: string, newCategory: string) {
+  async function handleLabelChange(id: string, labelId: string | null) {
+    const body = labelId === null
+      ? { clear_label: true }
+      : { label_id: labelId }
     const res = await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
       headers: getHeaders(),
-      body: JSON.stringify({ category: newCategory }),
+      body: JSON.stringify(body),
     })
     const updated = await res.json()
-    const task = toTask(updated)
-    setTasks(prev => prev.map(t => t.id === id ? task : t))
+    setTasks(prev => prev.map(t => t.id === id ? toTask(updated) : t))
   }
 
   async function handleEdit(id: string, text: string) {
@@ -139,8 +158,7 @@ function App() {
       body: JSON.stringify({ task: text }),
     })
     const updated = await res.json()
-    const task = toTask(updated)
-    setTasks(prev => prev.map(t => t.id === id ? task : t))
+    setTasks(prev => prev.map(t => t.id === id ? toTask(updated) : t))
   }
 
   async function handleShowOriginalChange(id: string, showOriginal: boolean) {
@@ -156,6 +174,39 @@ function App() {
   async function handleDelete(id: string) {
     await fetch(`/api/tasks/${id}`, { method: 'DELETE', headers: getHeaders() })
     setTasks(prev => prev.filter(t => t.id !== id))
+  }
+
+  // Label CRUD handlers
+  async function handleCreateLabel(name: string, color: string, description: string): Promise<Label | null> {
+    const res = await fetch('/api/labels', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ name, color, description }),
+    })
+    if (!res.ok) return null
+    const created: Label = await res.json()
+    setLabels(prev => [...prev, created].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())))
+    return created
+  }
+
+  async function handleUpdateLabel(id: string, updates: Partial<Label>): Promise<boolean> {
+    const res = await fetch(`/api/labels/${id}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(updates),
+    })
+    if (!res.ok) return false
+    const updated: Label = await res.json()
+    setLabels(prev => prev.map(l => l.id === id ? updated : l).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())))
+    // Update any tasks that reference this label
+    setTasks(prev => prev.map(t => t.labelId === id ? { ...t, labelName: updated.name, labelColor: updated.color } : t))
+    return true
+  }
+
+  async function handleDeleteLabel(id: string) {
+    await fetch(`/api/labels/${id}`, { method: 'DELETE', headers: getHeaders() })
+    setLabels(prev => prev.filter(l => l.id !== id))
+    setTasks(prev => prev.map(t => t.labelId === id ? { ...t, labelId: null, labelName: null, labelColor: null } : t))
   }
 
   // Comment handlers
@@ -253,6 +304,9 @@ function App() {
               </button>
               {menuOpen && (
                 <div className="app-menu-popup">
+                  <button className="app-menu-item" onClick={() => { setMenuOpen(false); setShowLabelsManager(true) }}>
+                    Manage labels
+                  </button>
                   <button className="app-menu-item" onClick={() => { setMenuOpen(false); signOut() }}>
                     Sign out
                   </button>
@@ -266,12 +320,13 @@ function App() {
       <main className="app-content" ref={contentRef}>
         <TimelineView
           tasks={tasks}
+          labels={labels}
           tab={tab}
           justMarkedDone={justMarkedDone}
           onToggle={handleToggle}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          onCategoryChange={handleCategoryChange}
+          onLabelChange={handleLabelChange}
           onShowOriginalChange={handleShowOriginalChange}
           commentsMap={commentsMap}
           onFetchComments={handleFetchComments}
@@ -284,6 +339,15 @@ function App() {
         <div className="app-input">
           <InputBar value={input} onChange={v => { setInput(v); setSubmitError(null) }} onSubmit={handleSubmit} disabled={loading} error={submitError} />
         </div>
+      )}
+      {showLabelsManager && (
+        <LabelsManager
+          labels={labels}
+          onClose={() => setShowLabelsManager(false)}
+          onCreate={handleCreateLabel}
+          onUpdate={handleUpdateLabel}
+          onDelete={handleDeleteLabel}
+        />
       )}
     </div>
   )

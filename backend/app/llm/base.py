@@ -4,5 +4,5 @@ from app.models import Task
 
 class LLMProvider(ABC):
     @abstractmethod
-    async def process(self, text: str) -> list[Task]:
+    async def process(self, text: str, labels: list[dict]) -> list[Task]:
         ...

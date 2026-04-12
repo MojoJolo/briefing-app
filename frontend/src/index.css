@@ -540,7 +540,7 @@ body {
   transition: background 0.15s ease;
 }
 
-/* No category: reveal faintly on row hover */
+/* No label: reveal faintly on row hover */
 .task-item:hover .task-cat-btn--none .task-cat-strip {
   background: rgba(0, 0, 0, 0.1);
 }
@@ -548,30 +548,10 @@ body {
   color: #ccc;
 }
 
-/* Blocker */
-.task-cat-btn--blocker .task-cat-strip       { background: #e53935; }
-.task-cat-btn--blocker .task-cat-text        { color: #9b9b9b; }
-.task-cat-btn--blocker:hover .task-cat-strip { background: #c62828; }
-
-/* Issue */
-.task-cat-btn--issue .task-cat-strip         { background: #fb8c00; }
-.task-cat-btn--issue .task-cat-text          { color: #9b9b9b; }
-.task-cat-btn--issue:hover .task-cat-strip   { background: #e65100; }
-
-/* Pending */
-.task-cat-btn--pending .task-cat-strip       { background: #1e88e5; }
-.task-cat-btn--pending .task-cat-text        { color: #9b9b9b; }
-.task-cat-btn--pending:hover .task-cat-strip { background: #1565c0; }
-
-/* Delegated */
-.task-cat-btn--delegated .task-cat-strip       { background: #43a047; }
-.task-cat-btn--delegated .task-cat-text        { color: #9b9b9b; }
-.task-cat-btn--delegated:hover .task-cat-strip { background: #2e7d32; }
-
-/* Idea */
-.task-cat-btn--idea .task-cat-strip       { background: #8e24aa; }
-.task-cat-btn--idea .task-cat-text        { color: #9b9b9b; }
-.task-cat-btn--idea:hover .task-cat-strip { background: #6a1b9a; }
+/* Label assigned: always show the text */
+.task-cat-btn:not(.task-cat-btn--none) .task-cat-text {
+  color: #9b9b9b;
+}
 
 .task-label-menu {
   position: absolute;
@@ -611,6 +591,279 @@ body {
 .task-label-option--selected {
   background: rgba(99, 102, 241, 0.08);
   font-weight: 500;
+}
+
+.task-label-option-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 7px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* -------------------------------------------------------------------------
+   Labels Manager modal
+------------------------------------------------------------------------- */
+
+.labels-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+
+.labels-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+  width: 100%;
+  max-width: 460px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.labels-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  flex-shrink: 0;
+}
+
+.labels-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.labels-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+
+.labels-close-btn:hover {
+  color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.labels-body {
+  overflow-y: auto;
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.labels-empty {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  padding: 12px 0 4px;
+  margin: 0;
+}
+
+.labels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.label-row-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label-color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.label-color-swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12);
+}
+
+.label-color-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.label-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 4px;
+  transition: background 0.12s ease;
+}
+
+.label-name:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.label-name-input {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  border-radius: 5px;
+  padding: 2px 6px;
+  outline: none;
+  font-family: inherit;
+  background: #fff;
+}
+
+.label-name-input:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.label-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  padding: 4px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  transition: color 0.12s ease, background 0.12s ease;
+  flex-shrink: 0;
+}
+
+.label-delete-btn:hover {
+  color: #e53935;
+  background: rgba(229, 57, 53, 0.07);
+}
+
+.label-desc-row {
+  padding-left: 28px;
+}
+
+.label-desc {
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 4px;
+  display: block;
+  transition: background 0.12s ease;
+  line-height: 1.4;
+}
+
+.label-desc:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.label-desc--empty {
+  color: #bbb;
+  font-style: italic;
+}
+
+.label-desc-input {
+  width: 100%;
+  font-size: 12px;
+  color: #555;
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  border-radius: 5px;
+  padding: 4px 6px;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+  background: #fff;
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
+.label-desc-input:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.label-error {
+  font-size: 12px;
+  color: #e53935;
+  margin: 2px 0 0 28px;
+}
+
+/* Add label form */
+.label-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.label-add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label-add-btn {
+  background: #6366F1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  flex-shrink: 0;
+}
+
+.label-add-btn:hover:not(:disabled) {
+  background: #4F46E5;
+}
+
+.label-add-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* Clickable task rows */

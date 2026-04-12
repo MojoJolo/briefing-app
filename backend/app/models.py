@@ -7,11 +7,32 @@ from pydantic import BaseModel
 
 class Task(BaseModel):
     text: str
-    category: Literal["BLOCKER", "ISSUE", "PENDING", "DELEGATED", "IDEA", ""]
+    category: str
 
 
 class ProcessRequest(BaseModel):
     input: str
+
+
+class LabelCreate(BaseModel):
+    name: str
+    color: str
+    description: str = ""
+
+
+class LabelUpdate(BaseModel):
+    name: str | None = None
+    color: str | None = None
+    description: str | None = None
+
+
+class LabelResponse(BaseModel):
+    id: UUID
+    name: str
+    color: str
+    description: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class TaskResponse(BaseModel):
@@ -24,6 +45,9 @@ class TaskResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     comment_count: int = 0
+    label_id: UUID | None = None
+    label_name: str | None = None
+    label_color: str | None = None
 
 
 class TaskUpdate(BaseModel):
@@ -31,6 +55,8 @@ class TaskUpdate(BaseModel):
     task: str | None = None
     category: str | None = None
     show_original: bool | None = None
+    label_id: UUID | None = None
+    clear_label: bool = False
 
 
 class ProcessResponse(BaseModel):
@@ -51,4 +77,3 @@ class CommentCreate(BaseModel):
 
 class CommentUpdate(BaseModel):
     comment: str | None = None
-
