@@ -265,17 +265,16 @@ body {
   margin-left: 2px;
 }
 
-/* Idea item — no checkbox, no category gutter */
+/* Idea item — no checkbox, uses same gutter strip as task categories */
 .idea-item {
   position: relative;
   display: flex;
   align-items: flex-start;
-  padding: 9px 10px 9px 14px;
+  padding: 9px 8px;
   font-size: 14px;
   color: #1a1a1a;
   line-height: 1.5;
   border-radius: 8px;
-  border-left: 3px solid #8e24aa;
   transition: background 0.15s ease;
 }
 
