@@ -270,7 +270,7 @@ body {
   position: relative;
   display: flex;
   align-items: flex-start;
-  padding: 9px 8px;
+  padding: 9px 8px 9px 14px;
   font-size: 14px;
   color: #1a1a1a;
   line-height: 1.5;
@@ -278,8 +278,28 @@ body {
   transition: background 0.15s ease;
 }
 
+.idea-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: #8e24aa;
+  border-radius: 2px;
+}
+
 .idea-item:hover {
   background: rgba(0, 0, 0, 0.025);
+}
+
+.idea-item--done .task-text {
+  text-decoration: line-through;
+  color: #bbb;
+}
+
+.idea-item--done::before {
+  background: #d1b3e0;
 }
 
 .idea-body {

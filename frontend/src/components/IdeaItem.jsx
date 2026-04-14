@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { renderTextWithLinks } from '../utils/renderLinks'
 import CommentSection from './CommentSection'
 
-export default function IdeaItem({ id, text, commentCount, onEdit, onDelete, onConvertToTask, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function IdeaItem({ id, text, done, commentCount, onToggle, onEdit, onDelete, onConvertToTask, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(text)
   const [expanded, setExpanded] = useState(false)
@@ -68,7 +68,7 @@ export default function IdeaItem({ id, text, commentCount, onEdit, onDelete, onC
 
   function handleRowClick(e) {
     if (editing) return
-    if (e.target.closest('.idea-action-wrapper, a')) return
+    if (e.target.closest('.idea-action-wrapper, .task-checkbox, a')) return
     const next = !expanded
     setExpanded(next)
     if (next && !comments) {
@@ -78,7 +78,13 @@ export default function IdeaItem({ id, text, commentCount, onEdit, onDelete, onC
 
   return (
     <div className={`task-item-wrapper${expanded ? ' task-item-wrapper--expanded' : ''}`}>
-      <div className="idea-item task-item--clickable" onClick={handleRowClick}>
+      <div className={`idea-item task-item--clickable${done ? ' idea-item--done' : ''}`} onClick={handleRowClick}>
+        <input
+          type="checkbox"
+          className="task-checkbox"
+          checked={!!done}
+          onChange={onToggle}
+        />
         <div className="idea-body">
           <div className="task-row-main">
             {editing ? (
@@ -108,17 +114,17 @@ export default function IdeaItem({ id, text, commentCount, onEdit, onDelete, onC
                 >
                   <button
                     className="task-action-option"
-                    onClick={(e) => { e.stopPropagation(); setShowActionMenu(false); setEditing(true); }}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    Rename
-                  </button>
-                  <button
-                    className="task-action-option"
                     onClick={(e) => { e.stopPropagation(); setShowActionMenu(false); onConvertToTask(); }}
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
                     Convert to task
+                  </button>
+                  <button
+                    className="task-action-option"
+                    onClick={(e) => { e.stopPropagation(); setShowActionMenu(false); setEditing(true); }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Rename
                   </button>
                   <button
                     className="task-action-option task-action-option--delete"

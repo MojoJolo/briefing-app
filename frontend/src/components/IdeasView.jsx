@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import IdeaItem from './IdeaItem'
 
 const BUCKET_ORDER = ['Older', 'Last Month', 'Four Weeks Ago', 'Three Weeks Ago', 'Two Weeks Ago', 'Last Week', 'This Week', 'Yesterday', 'Today']
@@ -40,11 +41,37 @@ function buildBuckets(ideas) {
   return buckets
 }
 
-export default function IdeasView({ ideas, commentsMap, onEdit, onDelete, onConvertToTask, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
-  const buckets = buildBuckets(ideas)
+export default function IdeasView({ ideas, commentsMap, onEdit, onDelete, onToggle, onConvertToTask, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+  const [showDone, setShowDone] = useState(false)
+
+  const activeIdeas = ideas.filter(i => i.status !== 1)
+  const doneIdeas = ideas.filter(i => i.status === 1)
+
+  const buckets = buildBuckets(activeIdeas)
   const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
 
-  if (visibleBuckets.length === 0) {
+  function renderIdeaItem(idea, i) {
+    return (
+      <IdeaItem
+        key={idea.id ?? i}
+        id={idea.id}
+        text={idea.text}
+        done={idea.status === 1}
+        commentCount={idea.commentCount || 0}
+        onToggle={() => onToggle(idea.id, idea.status)}
+        onEdit={(text) => onEdit(idea.id, text)}
+        onDelete={() => onDelete(idea.id)}
+        onConvertToTask={() => onConvertToTask(idea.id)}
+        comments={commentsMap[idea.id]}
+        onFetchComments={onFetchComments}
+        onAddComment={onAddComment}
+        onEditComment={onEditComment}
+        onDeleteComment={onDeleteComment}
+      />
+    )
+  }
+
+  if (visibleBuckets.length === 0 && doneIdeas.length === 0) {
     return (
       <div className="empty-state">
         <svg className="empty-state-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -66,25 +93,21 @@ export default function IdeasView({ ideas, commentsMap, onEdit, onDelete, onConv
         <div key={bucket} className="timeline-section">
           <div className="timeline-header">{bucket}</div>
           <div className="timeline-items">
-            {buckets[bucket].map((idea, i) => (
-              <IdeaItem
-                key={idea.id ?? i}
-                id={idea.id}
-                text={idea.text}
-                commentCount={idea.commentCount || 0}
-                onEdit={(text) => onEdit(idea.id, text)}
-                onDelete={() => onDelete(idea.id)}
-                onConvertToTask={() => onConvertToTask(idea.id)}
-                comments={commentsMap[idea.id]}
-                onFetchComments={onFetchComments}
-                onAddComment={onAddComment}
-                onEditComment={onEditComment}
-                onDeleteComment={onDeleteComment}
-              />
-            ))}
+            {buckets[bucket].map((idea, i) => renderIdeaItem(idea, i))}
           </div>
         </div>
       ))}
+      {doneIdeas.length > 0 && (
+        <button className="done-toggle" onClick={() => setShowDone(d => !d)}>
+          <span className="done-toggle-label">{showDone ? '▾' : '▸'} Done</span>
+          <span className="done-toggle-count">{doneIdeas.length}</span>
+        </button>
+      )}
+      {showDone && (
+        <div className="timeline-items">
+          {doneIdeas.map((idea, i) => renderIdeaItem(idea, i))}
+        </div>
+      )}
     </div>
   )
 }

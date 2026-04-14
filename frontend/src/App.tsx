@@ -120,6 +120,10 @@ function App() {
     handleCategoryChange(id, '')
   }
 
+  function handleMoveToIdeas(id: string) {
+    handleCategoryChange(id, 'IDEA')
+  }
+
   async function handleToggle(id: string, currentStatus: number) {
     const newStatus = currentStatus === 1 ? 0 : 1
     const res = await fetch(`/api/tasks/${id}`, {
@@ -304,6 +308,7 @@ function App() {
             commentsMap={commentsMap}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onToggle={handleToggle}
             onConvertToTask={handleConvertToTask}
             onFetchComments={handleFetchComments}
             onAddComment={handleAddComment}
@@ -319,6 +324,7 @@ function App() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onCategoryChange={handleCategoryChange}
+            onMoveToIdeas={handleMoveToIdeas}
             onShowOriginalChange={handleShowOriginalChange}
             commentsMap={commentsMap}
             onFetchComments={handleFetchComments}
