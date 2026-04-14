@@ -77,13 +77,8 @@ export default function IdeaItem({ id, text, commentCount, onEdit, onDelete, onC
   }
 
   return (
-    <div className={`idea-item-wrapper${expanded ? ' idea-item-wrapper--expanded' : ''}`}>
+    <div className={`task-item-wrapper${expanded ? ' task-item-wrapper--expanded' : ''}`}>
       <div className="idea-item task-item--clickable" onClick={handleRowClick}>
-        <div className="task-cat-wrapper">
-          <div className="task-cat-btn task-cat-btn--idea">
-            <span className="task-cat-strip" />
-          </div>
-        </div>
         <div className="idea-body">
           <div className="task-row-main">
             {editing ? (

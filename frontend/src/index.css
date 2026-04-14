@@ -265,7 +265,7 @@ body {
   margin-left: 2px;
 }
 
-/* Idea item — no checkbox, uses same gutter strip as task categories */
+/* Idea item — no checkbox, no category gutter */
 .idea-item {
   position: relative;
   display: flex;
@@ -693,20 +693,6 @@ body {
   background: rgba(0, 0, 0, 0.015);
   border-radius: 8px;
   margin: 2px 0;
-}
-
-/* Idea item wrapper (expandable) */
-.idea-item-wrapper {
-  margin: 2px 0;
-}
-
-.idea-item-wrapper--expanded {
-  border-radius: 8px;
-  margin: 2px 0;
-}
-
-.idea-item-wrapper--expanded .comment-section {
-  padding-left: 14px;
 }
 
 /* Comment section */
