@@ -116,14 +116,20 @@ export default function CommentSection({ taskId, comments, onAdd, onEdit, onDele
         <CommentItem key={c.id} comment={c} onEdit={onEdit} onDelete={onDelete} />
       ))}
       <form onSubmit={handleSubmit} style={{ margin: 0 }}>
-        <input
-          className="comment-input"
-          placeholder="Add a comment..."
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          enterKeyHint="send"
-        />
+        <div className="comment-input-wrapper">
+          <input
+            className="comment-input"
+            placeholder="Add a comment..."
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            enterKeyHint="send"
+          />
+          <svg className="comment-input-enter" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M9 2v5.5H2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M4 5l-2 2.5 2 2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
       </form>
     </div>
   )

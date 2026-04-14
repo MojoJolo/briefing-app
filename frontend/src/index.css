@@ -810,6 +810,28 @@ body {
   color: #c0bdb8;
 }
 
+.comment-input-wrapper {
+  position: relative;
+}
+
+.comment-input-wrapper .comment-input {
+  padding-right: 20px;
+}
+
+.comment-input-enter {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d8d5d0;
+  pointer-events: none;
+  transition: color 0.15s ease;
+}
+
+.comment-input-wrapper:focus-within .comment-input-enter {
+  color: #a5b4fc;
+}
+
 /* Done section */
 .done-list {
   padding: 6px 4px 14px;
