@@ -74,7 +74,7 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
   }
 
   if (tab === 'done') {
-    const doneTasks = tasks.filter(t => t.status === 1 && !justMarkedDone.has(t.id))
+    const doneTasks = tasks.filter(t => t.status === 1 && !justMarkedDone.has(t.id) && t.category !== 'IDEA')
     const buckets = buildBuckets(doneTasks, 'updatedAt', false)
     const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
 
@@ -106,7 +106,7 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
   }
 
   // Open tab: show open tasks + tasks just marked done in this session (in-place, with strikethrough)
-  const activeTasks = tasks.filter(t => t.status === 0 || justMarkedDone.has(t.id))
+  const activeTasks = tasks.filter(t => (t.status === 0 || justMarkedDone.has(t.id)) && t.category !== 'IDEA')
   const buckets = buildBuckets(activeTasks, 'createdAt', true)
   const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
 

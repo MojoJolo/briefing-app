@@ -265,6 +265,31 @@ body {
   margin-left: 2px;
 }
 
+/* Idea item — no checkbox, no category gutter */
+.idea-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 9px 8px;
+  font-size: 14px;
+  color: #1a1a1a;
+  line-height: 1.5;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.idea-item:hover {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.idea-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 /* Task items */
 .task-item {
   position: relative;
@@ -1082,7 +1107,8 @@ body {
     padding: 0 2px;
   }
 
-  .task-item {
+  .task-item,
+  .idea-item {
     padding: 8px 6px;
     font-size: 13px;
   }
