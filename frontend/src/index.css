@@ -275,16 +275,12 @@ body {
   color: #1a1a1a;
   line-height: 1.5;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.05);
   border-left: 3px solid #8e24aa;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .idea-item:hover {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0, 0, 0, 0.07);
-  border-left-color: #8e24aa;
+  background: rgba(0, 0, 0, 0.025);
 }
 
 .idea-body {
@@ -710,19 +706,7 @@ body {
   margin: 2px 0;
 }
 
-.idea-item-wrapper--expanded .idea-item {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-bottom-color: transparent;
-}
-
 .idea-item-wrapper--expanded .comment-section {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-top: none;
-  border-left: 3px solid #8e24aa;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
   padding-left: 14px;
 }
 
