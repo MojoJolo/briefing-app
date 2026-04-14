@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 export default function AuthPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -23,6 +24,22 @@ export default function AuthPage() {
     }
   }
 
+  async function handleVerify(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: code.trim(),
+        type: 'email',
+      })
+      if (error) setError(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="auth-page">
       <div className="auth-card">
@@ -31,13 +48,28 @@ export default function AuthPage() {
           <span className="app-title">Briefing</span>
         </div>
         {sent ? (
-          <div className="auth-sent">
+          <form onSubmit={handleVerify} className="auth-form">
             <p className="auth-sent-title">Check your email</p>
-            <p className="auth-sent-hint">We sent a magic link to <strong>{email}</strong>. Click it to sign in.</p>
-            <button className="auth-toggle" onClick={() => { setSent(false); setEmail('') }}>
+            <p className="auth-sent-hint">We sent a 6-digit code to <strong>{email}</strong>.</p>
+            <input
+              className="auth-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="000000"
+              maxLength={6}
+              value={code}
+              onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
+              required
+              autoFocus
+            />
+            {error && <p className="auth-error">{error}</p>}
+            <button className="auth-submit" type="submit" disabled={loading || code.length < 6}>
+              {loading ? 'Verifying…' : 'Sign in'}
+            </button>
+            <button className="auth-toggle" type="button" onClick={() => { setSent(false); setEmail(''); setCode('') }}>
               Use a different email
             </button>
-          </div>
+          </form>
         ) : (
           <form onSubmit={handleSubmit} className="auth-form">
             <input
@@ -51,7 +83,7 @@ export default function AuthPage() {
             />
             {error && <p className="auth-error">{error}</p>}
             <button className="auth-submit" type="submit" disabled={loading}>
-              {loading ? 'Sending…' : 'Send magic link'}
+              {loading ? 'Sending…' : 'Send code'}
             </button>
           </form>
         )}
