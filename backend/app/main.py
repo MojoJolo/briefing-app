@@ -8,7 +8,7 @@ import asyncpg
 
 from app.auth import get_current_user_id
 from app.database import connect, disconnect, get_db
-from app.models import ProcessRequest, ProcessResponse, TaskUpdate, TaskResponse, CommentCreate, CommentUpdate, CommentResponse
+from app.models import ProcessRequest, ProcessResponse, TaskUpdate, TaskResponse, CommentCreate, CommentUpdate, CommentResponse, IdeaCreate
 from app.llm.factory import provider
 
 
@@ -131,6 +131,24 @@ async def process_input(
     )
 
     return ProcessResponse(tasks=[TaskResponse(**row) for row in rows])
+
+
+@app.post("/ideas", response_model=TaskResponse, status_code=201)
+async def create_idea(
+    body: IdeaCreate,
+    db: asyncpg.Connection = Depends(get_db),
+    user_id: UUID = Depends(get_current_user_id),
+):
+    row = await db.fetchrow(
+        """
+        INSERT INTO tasks (task, category, original_input, user_id)
+        VALUES ($1, 'idea', '', $2)
+        RETURNING id, task, category, status, original_input, show_original, created_at, updated_at
+        """,
+        body.text,
+        user_id,
+    )
+    return TaskResponse(**row, comment_count=0)
 
 
 async def _assert_task_owner(db: asyncpg.Connection, task_id: UUID, user_id: UUID):

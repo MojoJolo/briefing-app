@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import TimelineView from './components/TimelineView'
+import IdeasView from './components/IdeasView'
 import InputBar from './components/InputBar'
 import AuthPage from './components/AuthPage'
 import { useAuth } from './contexts/AuthContext'
@@ -19,7 +20,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({})
-  const [tab, setTab] = useState<'open' | 'done'>('open')
+  const [tab, setTab] = useState<'ideas' | 'open' | 'done'>('open')
   const [justMarkedDone, setJustMarkedDone] = useState<Set<string>>(new Set())
   const [menuOpen, setMenuOpen] = useState(false)
   const contentRef = useRef<HTMLElement>(null)
@@ -62,8 +63,11 @@ function App() {
   }, [tasks])
 
   useEffect(() => {
-    if (tab === 'open' && contentRef.current) {
+    if (!contentRef.current) return
+    if (tab === 'open') {
       contentRef.current.scrollTop = contentRef.current.scrollHeight
+    } else {
+      contentRef.current.scrollTop = 0
     }
   }, [tab])
 
@@ -88,6 +92,36 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleIdeaSubmit(value: string) {
+    setInput('')
+    setSubmitError(null)
+    setLoading(true)
+    try {
+      const res = await fetch('/api/ideas', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ text: value }),
+      })
+      if (!res.ok) throw new Error('Request failed')
+      const data = await res.json()
+      const newIdea = toTask(data)
+      setTasks(prev => [newIdea, ...prev])
+    } catch {
+      setInput(value)
+      setSubmitError('Failed to submit. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleConvertToTask(id: string) {
+    handleCategoryChange(id, '')
+  }
+
+  function handleMoveToIdeas(id: string) {
+    handleCategoryChange(id, 'IDEA')
   }
 
   async function handleToggle(id: string, currentStatus: number) {
@@ -236,6 +270,10 @@ function App() {
           <div className="app-header-right">
             <div className="app-tabs">
               <button
+                className={`app-tab${tab === 'ideas' ? ' app-tab--active' : ''}`}
+                onClick={() => setTab('ideas')}
+              >Ideas</button>
+              <button
                 className={`app-tab${tab === 'open' ? ' app-tab--active' : ''}`}
                 onClick={() => setTab('open')}
               >Open</button>
@@ -264,25 +302,46 @@ function App() {
         <div className="app-header-line" />
       </header>
       <main className="app-content" ref={contentRef}>
-        <TimelineView
-          tasks={tasks}
-          tab={tab}
-          justMarkedDone={justMarkedDone}
-          onToggle={handleToggle}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onCategoryChange={handleCategoryChange}
-          onShowOriginalChange={handleShowOriginalChange}
-          commentsMap={commentsMap}
-          onFetchComments={handleFetchComments}
-          onAddComment={handleAddComment}
-          onEditComment={handleEditComment}
-          onDeleteComment={handleDeleteComment}
-        />
+        {tab === 'ideas' ? (
+          <IdeasView
+            ideas={tasks.filter(t => t.category === 'IDEA' && t.status !== -1)}
+            commentsMap={commentsMap}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggle={handleToggle}
+            onConvertToTask={handleConvertToTask}
+            onFetchComments={handleFetchComments}
+            onAddComment={handleAddComment}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
+          />
+        ) : (
+          <TimelineView
+            tasks={tasks}
+            tab={tab}
+            justMarkedDone={justMarkedDone}
+            onToggle={handleToggle}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onCategoryChange={handleCategoryChange}
+            onMoveToIdeas={handleMoveToIdeas}
+            onShowOriginalChange={handleShowOriginalChange}
+            commentsMap={commentsMap}
+            onFetchComments={handleFetchComments}
+            onAddComment={handleAddComment}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
+          />
+        )}
       </main>
       {tab === 'open' && (
         <div className="app-input">
           <InputBar value={input} onChange={v => { setInput(v); setSubmitError(null) }} onSubmit={handleSubmit} disabled={loading} error={submitError} />
+        </div>
+      )}
+      {tab === 'ideas' && (
+        <div className="app-input">
+          <InputBar value={input} onChange={v => { setInput(v); setSubmitError(null) }} onSubmit={handleIdeaSubmit} disabled={loading} error={submitError} placeholder="Capture an idea..." />
         </div>
       )}
     </div>

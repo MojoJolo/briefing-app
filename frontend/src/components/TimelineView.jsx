@@ -44,7 +44,7 @@ function buildBuckets(tasks, dateField, sortAsc) {
   return buckets
 }
 
-export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onEdit, onDelete, onCategoryChange, onShowOriginalChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onEdit, onDelete, onCategoryChange, onMoveToIdeas, onShowOriginalChange, commentsMap, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
 
   function renderTask(task, i, opts = {}) {
     return (
@@ -63,6 +63,7 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
         onEdit={(text) => onEdit(task.id, text)}
         onDelete={() => onDelete(task.id)}
         onCategoryChange={(cat) => onCategoryChange(task.id, cat)}
+        onMoveToIdeas={() => onMoveToIdeas(task.id)}
         onShowOriginalChange={(val) => onShowOriginalChange(task.id, val)}
         comments={commentsMap[task.id]}
         onFetchComments={onFetchComments}
@@ -74,7 +75,7 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
   }
 
   if (tab === 'done') {
-    const doneTasks = tasks.filter(t => t.status === 1 && !justMarkedDone.has(t.id))
+    const doneTasks = tasks.filter(t => t.status === 1 && !justMarkedDone.has(t.id) && t.category !== 'IDEA')
     const buckets = buildBuckets(doneTasks, 'updatedAt', false)
     const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
 
@@ -106,7 +107,7 @@ export default function TimelineView({ tasks, tab, justMarkedDone, onToggle, onE
   }
 
   // Open tab: show open tasks + tasks just marked done in this session (in-place, with strikethrough)
-  const activeTasks = tasks.filter(t => t.status === 0 || justMarkedDone.has(t.id))
+  const activeTasks = tasks.filter(t => (t.status === 0 || justMarkedDone.has(t.id)) && t.category !== 'IDEA')
   const buckets = buildBuckets(activeTasks, 'createdAt', true)
   const visibleBuckets = BUCKET_ORDER.filter(b => buckets[b]?.length > 0)
 

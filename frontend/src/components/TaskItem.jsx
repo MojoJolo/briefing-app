@@ -8,10 +8,9 @@ const CATEGORY_OPTIONS = [
   { value: 'ISSUE', label: '🐛 Issue' },
   { value: 'PENDING', label: '⏳ Pending' },
   { value: 'DELEGATED', label: '👤 Delegated' },
-  { value: 'IDEA', label: '💡 Idea' },
 ]
 
-export default function TaskItem({ id, text, originalInput, showOriginal, done, strikethrough, fading, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, onShowOriginalChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
+export default function TaskItem({ id, text, originalInput, showOriginal, done, strikethrough, fading, category, commentCount, onToggle, onEdit, onDelete, onCategoryChange, onMoveToIdeas, onShowOriginalChange, comments, onFetchComments, onAddComment, onEditComment, onDeleteComment }) {
   const showDoneStyle = strikethrough !== undefined ? strikethrough : done
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(text)
@@ -211,6 +210,13 @@ export default function TaskItem({ id, text, originalInput, showOriginal, done, 
                   className="task-action-menu"
                   style={{ position: 'fixed', top: actionMenuPos.top, right: actionMenuPos.right, margin: 0 }}
                 >
+                  <button
+                    className="task-action-option"
+                    onClick={(e) => { e.stopPropagation(); setShowActionMenu(false); onMoveToIdeas(); }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Move to Ideas
+                  </button>
                   <button
                     className="task-action-option"
                     onClick={(e) => { e.stopPropagation(); setShowActionMenu(false); setEditing(true); }}

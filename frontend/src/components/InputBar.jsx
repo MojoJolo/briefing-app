@@ -1,4 +1,4 @@
-export default function InputBar({ value, onChange, onSubmit, disabled, error }) {
+export default function InputBar({ value, onChange, onSubmit, disabled, error, placeholder }) {
   function handleSubmit() {
     if (value.trim()) {
       onSubmit(value.trim())
@@ -17,7 +17,7 @@ export default function InputBar({ value, onChange, onSubmit, disabled, error })
       <textarea
         className="input-field"
         rows={3}
-        placeholder="What's on your plate?"
+        placeholder={placeholder || "What's on your plate?"}
         value={value}
         onChange={e => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
