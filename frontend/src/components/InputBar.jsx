@@ -22,7 +22,6 @@ export default function InputBar({ value, onChange, onSubmit, disabled, error, p
         onChange={e => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         disabled={disabled}
-        autoFocus
       />
       <div className="input-footer">
         <span className="input-hint">{error ? <span className="input-error">{error}</span> : 'Shift + Enter for new line'}</span>
