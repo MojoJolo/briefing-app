@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
-  <title>Briefing — For Engineering Leaders</title>
+  <title>Briefing — For Founders and Builders</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -24,6 +24,8 @@
       --bar-issue:     #fb8c00;
       --bar-pending:   #1e88e5;
       --bar-delegated: #43a047;
+      --bar-idea:      #7c3aed;
+      --bar-completed: #78909c;
       --success:       #3d7a57;
     }
 
@@ -286,12 +288,15 @@
     .task-item.cat-issue::before     { background: var(--bar-issue); }
     .task-item.cat-pending::before   { background: var(--bar-pending); }
     .task-item.cat-delegated::before { background: var(--bar-delegated); }
+    .task-item.cat-idea::before      { background: var(--bar-idea); }
+    .task-item.cat-completed::before { background: var(--bar-completed); }
 
     .task-item:nth-child(2) { animation: slideIn 0.4s 0.55s ease forwards; }
     .task-item:nth-child(3) { animation: slideIn 0.4s 0.68s ease forwards; }
     .task-item:nth-child(4) { animation: slideIn 0.4s 0.81s ease forwards; }
     .task-item:nth-child(5) { animation: slideIn 0.4s 0.94s ease forwards; }
     .task-item:nth-child(6) { animation: slideIn 0.4s 1.07s ease forwards; }
+    .task-item:nth-child(7) { animation: slideIn 0.4s 1.20s ease forwards; }
 
     .task-label {
       font-family: 'DM Mono', monospace;
@@ -307,6 +312,8 @@
     .cat-blocker   .task-label { color: var(--bar-blocker); }
     .cat-issue     .task-label { color: var(--bar-issue); }
     .cat-delegated .task-label { color: var(--bar-delegated); }
+    .cat-idea      .task-label { color: var(--bar-idea); }
+    .cat-completed .task-label { color: var(--bar-completed); }
 
     .task-text {
       font-size: 13px;
@@ -415,7 +422,7 @@
 
   <main>
     <div class="left">
-      <div class="eyebrow">For engineering leaders</div>
+      <div class="eyebrow">For founders and builders</div>
 
       <h1>Your messy work notes,<br /><em>finally organized</em></h1>
 
@@ -453,52 +460,60 @@
 
     <div class="right">
       <div class="task-feed">
-        <div class="feed-header">Today · 5 tasks captured</div>
+        <div class="feed-header">Today · 6 tasks captured</div>
 
-        <div class="task-item cat-blocker">
-          <span class="task-label">Blocker</span>
+        <div class="task-item cat-idea">
+          <span class="task-label">Idea</span>
           <div>
-            <div class="task-text">Payment service can't connect to staging DB. Deploy blocked since 10am.</div>
-            <div class="task-meta">9 minutes ago</div>
+            <div class="task-text">Add waitlist to landing page</div>
+            <div class="task-meta">12 minutes ago</div>
           </div>
         </div>
 
         <div class="task-item cat-issue">
           <span class="task-label">Issue</span>
           <div>
-            <div class="task-text">iOS build times jumped to 18 min. Investigate caching.</div>
-            <div class="task-meta">42 minutes ago</div>
+            <div class="task-text">Stripe webhook failing in production</div>
+            <div class="task-meta">34 minutes ago</div>
+          </div>
+        </div>
+
+        <div class="task-item cat-pending">
+          <span class="task-label">Pending</span>
+          <div>
+            <div class="task-text">Write launch tweet for new feature</div>
+            <div class="task-meta">1 hour ago</div>
           </div>
         </div>
 
         <div class="task-item cat-delegated">
           <span class="task-label">Delegated</span>
           <div>
-            <div class="task-text"><span class="mention">@Marco</span> to follow up with platform team on rate limiting spec</div>
-            <div class="task-meta">1 hour ago</div>
-          </div>
-        </div>
-
-        <div class="task-item cat-pending">
-          <span class="task-label">Pending</span>
-          <div>
-            <div class="task-text">Performance review cycle next week. Pull 360 data.</div>
+            <div class="task-text">Ask designer to update landing page</div>
             <div class="task-meta">2 hours ago</div>
           </div>
         </div>
 
-        <div class="task-item cat-pending">
-          <span class="task-label">Pending</span>
+        <div class="task-item cat-blocker">
+          <span class="task-label">Blocker</span>
           <div>
-            <div class="task-text">Prep agenda for all-hands Thursday</div>
+            <div class="task-text">Supabase auth bug on mobile</div>
             <div class="task-meta">3 hours ago</div>
+          </div>
+        </div>
+
+        <div class="task-item cat-completed">
+          <span class="task-label">Completed</span>
+          <div>
+            <div class="task-text">Deploy onboarding fix</div>
+            <div class="task-meta">4 hours ago</div>
           </div>
         </div>
 
         <div class="input-preview">
           <div class="input-preview-label">You type → Briefing organizes</div>
           <div class="input-preview-text">
-            auth broken on prod, rj is on it. marco needs to chase platform on rate limits. prep for thursday all-hands<span class="cursor"></span>
+            stripe webhook broken in prod. ask sarah to update landing page. write launch tweet for new feature<span class="cursor"></span>
           </div>
         </div>
       </div>
