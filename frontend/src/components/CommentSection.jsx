@@ -41,7 +41,12 @@ function CommentItem({ comment, onEdit, onDelete }) {
   }
 
   function handleBlur() {
-    setValue(comment.comment)
+    const trimmed = value.trim()
+    if (trimmed && trimmed !== comment.comment) {
+      onEdit(comment.id, trimmed)
+    } else {
+      setValue(comment.comment)
+    }
     setEditing(false)
   }
 
@@ -70,14 +75,18 @@ function CommentItem({ comment, onEdit, onDelete }) {
 export default function CommentSection({ taskId, comments, onAdd, onEdit, onDelete }) {
   const [input, setInput] = useState('')
 
+  function handleSubmit() {
+    const trimmed = input.trim()
+    if (trimmed) {
+      onAdd(taskId, trimmed)
+      setInput('')
+    }
+  }
+
   function handleKeyDown(e) {
     if (e.key === 'Enter') {
       e.preventDefault()
-      const trimmed = input.trim()
-      if (trimmed) {
-        onAdd(taskId, trimmed)
-        setInput('')
-      }
+      handleSubmit()
     }
   }
 
@@ -86,13 +95,26 @@ export default function CommentSection({ taskId, comments, onAdd, onEdit, onDele
       {comments.map(c => (
         <CommentItem key={c.id} comment={c} onEdit={onEdit} onDelete={onDelete} />
       ))}
-      <input
-        className="comment-input"
-        placeholder="Add a comment..."
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
+      <div className="comment-input-row">
+        <input
+          className="comment-input"
+          placeholder="Add a comment..."
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          enterKeyHint="send"
+        />
+        <button
+          className="comment-submit"
+          onClick={handleSubmit}
+          disabled={!input.trim()}
+          aria-label="Add comment"
+        >
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            <path d="M8 13V3M4 7l4-4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
     </div>
   )
 }
