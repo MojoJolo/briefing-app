@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -422,7 +423,6 @@
         Briefing turns raw notes into a timeline of tasks, blockers, and follow-ups so nothing slips through.
       </p>
 
-      <!-- WAITLIST FORM — re-enable when Formspree is set up
       <div class="form-wrapper">
         <label class="form-label" for="email-input">Join the waitlist</label>
 
@@ -448,11 +448,6 @@
         </div>
 
         <p class="form-note">No spam. Just a heads-up when we launch.</p>
-      </div>
-      -->
-
-      <div class="form-wrapper">
-        <p class="form-note">Waitlist opening soon. Check back shortly.</p>
       </div>
     </div>
 
@@ -515,8 +510,12 @@
     <div class="footer-tag">Built for EMs and tech leads</div>
   </footer>
 
-  <!-- WAITLIST SCRIPT — re-enable when Formspree is set up
   <script>
+    const supabaseClient = supabase.createClient(
+      'https://qzxvdgdsipaebanfxzwl.supabase.co',
+      'sb_publishable_g6bchSnnsdiA25-X9jgv6A_htTi3raz'
+    );
+
     async function handleSubmit() {
       const input = document.getElementById('email-input');
       const btn = document.getElementById('submit-btn');
@@ -535,17 +534,14 @@
       btn.textContent = 'Sending...';
 
       try {
-        const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ email })
-        });
+        const { error } = await supabaseClient.from('waitlist').insert({ email });
 
-        if (res.ok) {
+        // Treat duplicate email as success — don't leak whether address was already registered
+        if (!error || error.code === '23505') {
           formRow.style.display = 'none';
           successMsg.classList.add('show');
         } else {
-          throw new Error('Failed');
+          throw new Error(error.message);
         }
       } catch {
         btn.disabled = false;
@@ -559,6 +555,5 @@
       if (e.key === 'Enter') handleSubmit();
     });
   </script>
-  -->
 </body>
 </html>
