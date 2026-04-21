@@ -180,7 +180,7 @@ export default function TaskItem({ id, text, originalInput, showOriginal, done, 
               />
             ) : (
               <span className="task-text" onDoubleClick={handleDoubleClick}>
-                {robotMode ? renderTextWithLinks(text) : (originalInput || text)}
+                {renderTextWithLinks(robotMode ? text : (originalInput || text))}
               </span>
             )}
             {commentCount > 0 && (
